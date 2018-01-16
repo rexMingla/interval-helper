@@ -1,0 +1,17 @@
+<strings>
+    <string id="AppName">Interval Helper</string>
+
+    <string id="menu_start_start">Start</string>
+    <string id="menu_start_select">Select Activity</string>
+
+    <string id="middle">Default</string>
+    <string id="menu_label_1">Resume</string>
+    <string id="menu_label_2">Save</string>
+    <string id="menu_label_3">Discard</string>  
+
+    <string id="menu_activity_title">Select Activity</string>
+    <string id="menu_activity_run">Run</string>
+    <string id="menu_activity_bike">Bike</string>
+    <string id="menu_activity_swim">Swim</string>
+    <string id="menu_activity_other">Other</string>  
+</strings>

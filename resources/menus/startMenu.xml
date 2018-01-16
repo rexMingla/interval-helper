@@ -1,0 +1,4 @@
+<menu id="StartMenu">
+    <menu-item id="start" label="@Strings.menu_start_start"></menu-item>
+    <menu-item id="select" label="@Strings.menu_start_select"></menu-item>
+</menu>
