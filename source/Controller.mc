@@ -8,10 +8,12 @@ class Controller {
     private var mModel;
     private var mTimer;
     private var mIsShowingLapSummaryView;
+    private var mIsSilent;
 
     function initialize() {
         mTimer = new Timer.Timer();
         mModel = Application.getApp().model;
+        mIsSilent = true;
     }
 
     function setActivity(activity) {
@@ -87,7 +89,7 @@ class Controller {
 
     function onLap() {
         performAttention(Attention.TONE_LAP);
-        var data = mModel.getLapData();
+        var data = mModel.getLapData().clone();
         mModel.startLap();
 
         mTimer.stop();
@@ -116,11 +118,14 @@ class Controller {
     }
 
     function performAttention(tone) {
+        if (mIsSilent) {
+            return;
+        }
         if (Attention has :playTone) {
             Attention.playTone(tone);
         }
         if (Attention has :vibrate) {
             Attention.vibrate([new Attention.VibeProfile(50, 1000)]);
-         }
+        }
     }
  }

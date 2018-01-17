@@ -21,5 +21,19 @@ module data {
             GpsAccuracy = null;
             Activity = null;
         }
+
+        function clone() {
+            var ret =  new ViewDataset();
+            ret.LapNumber = LapNumber;
+            ret.IsActive = IsActive;
+            ret.DistanceInKms = DistanceInKms;
+            ret.HeartRate = HeartRate;
+            ret.PaceInMinsPerKm = PaceInMinsPerKm;
+            ret.SpeedInKmsPerHour = SpeedInKmsPerHour;
+            ret.ElapsedSeconds = ElapsedSeconds;
+            ret.GpsAccuracy = GpsAccuracy;
+            ret.Activity = Activity;
+            return ret;
+        }
     }
 }

@@ -117,12 +117,12 @@ class Model
         mLapCurrentData.IsActive = isActiveLap();
         mLapCurrentData.LapNumber = (getLap() + 1) / 2;
         // currentSpeed = metres / sec
-        mLapCurrentData.SpeedInKmsPerHour = 60 * safeGetNumber(info.currentSpeed) / 1000;
+        mLapCurrentData.SpeedInKmsPerHour = 360 * safeGetNumber(info.currentSpeed) / 1000;
         mLapCurrentData.PaceInMinsPerKm = mLapCurrentData.SpeedInKmsPerHour == 0 ? 0 : 60 / mLapCurrentData.SpeedInKmsPerHour;
         mLapCurrentData.HeartRate = safeGetNumber(info.currentHeartRate);
         mLapCurrentData.ElapsedSeconds = mLapSeconds;
         mLapCurrentData.DistanceInKms = (safeGetNumber(info.elapsedDistance) / 1000) - mStartOfLapDistanceInKms;
-        mLapCurrentData.GpsAccuracy = mGpsAccuracy;
+        mLapCurrentData.GpsAccuracy = info.currentLocationAccuracy;
         mLapCurrentData.Activity = mActivity;
 
         return mLapCurrentData;
@@ -133,12 +133,12 @@ class Model
         mOverallData.IsActive = isActiveLap();
         mOverallData.LapNumber = (getLap() + 1) / 2;
         // currentSpeed = metres / sec
-        mOverallData.SpeedInKmsPerHour = 60 * safeGetNumber(info.averageSpeed) / 1000;
+        mOverallData.SpeedInKmsPerHour = 360 * safeGetNumber(info.averageSpeed) / 1000;
         mOverallData.PaceInMinsPerKm = mLapCurrentData.SpeedInKmsPerHour == 0 ? 0 : 60 / mLapCurrentData.SpeedInKmsPerHour;
         mOverallData.HeartRate = safeGetNumber(info.averageHeartRate);
-        mOverallData.ElapsedSeconds = info.elapsedTime / 1000;
-        mOverallData.DistanceInKms = (safeGetNumber(info.elapsedDistance) / 1000);
-        mOverallData.GpsAccuracy = mGpsAccuracy;
+        mOverallData.ElapsedSeconds = safeGetNumber(info.elapsedTime) / 1000;
+        mOverallData.DistanceInKms = safeGetNumber(info.elapsedDistance) / 1000;
+        mOverallData.GpsAccuracy = info.currentLocationAccuracy;
         mOverallData.Activity = mActivity;
 
         return mOverallData;
@@ -165,6 +165,5 @@ class Model
     }
 
     private function positionCallback(info) {
-        mGpsAccuracy = info.accuracy == null ? Position.QUALITY_POOR : info.accuracy;
     }
 }

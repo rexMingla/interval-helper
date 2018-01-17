@@ -34,11 +34,11 @@ module view {
             drawTextAndData(dc, lapLabelString, lapNumberString, mDetails.CentreColumn, mDetails.TopRow);
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            var distString = data.Formatter.getFloat(mData.DistanceInKms);
-            drawTextAndData(dc, labels.Distance, distString, mDetails.CentreColumn, mDetails.CentreRow);
-
             var timeString = data.Formatter.getTimeFromSecs(mData.ElapsedSeconds);
-            drawTextAndData(dc, labels.Time, timeString, mDetails.CentreColumn, mDetails.BottomRow);
+            drawTextAndData(dc, labels.Time, timeString, mDetails.CentreColumn, mDetails.CentreRow);
+
+            var distString = data.Formatter.getFloat(mData.DistanceInKms);
+            drawTextAndData(dc, labels.Distance, distString, mDetails.CentreColumn, mDetails.BottomRow);
         }
 
         private function drawTextAndData(dc, label, data, x, y) {
