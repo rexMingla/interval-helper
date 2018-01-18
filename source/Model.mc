@@ -117,7 +117,7 @@ class Model
         mLapCurrentData.IsActive = isActiveLap();
         mLapCurrentData.LapNumber = (getLap() + 1) / 2;
         // currentSpeed = metres / sec
-        mLapCurrentData.SpeedInKmsPerHour = 360 * safeGetNumber(info.currentSpeed) / 1000;
+        mLapCurrentData.SpeedInKmsPerHour = 3.6 * safeGetNumber(info.currentSpeed);
         mLapCurrentData.PaceInMinsPerKm = mLapCurrentData.SpeedInKmsPerHour == 0 ? 0 : 60 / mLapCurrentData.SpeedInKmsPerHour;
         mLapCurrentData.HeartRate = safeGetNumber(info.currentHeartRate);
         mLapCurrentData.ElapsedSeconds = mLapSeconds;
@@ -133,7 +133,7 @@ class Model
         mOverallData.IsActive = isActiveLap();
         mOverallData.LapNumber = (getLap() + 1) / 2;
         // currentSpeed = metres / sec
-        mOverallData.SpeedInKmsPerHour = 360 * safeGetNumber(info.averageSpeed) / 1000;
+        mOverallData.SpeedInKmsPerHour = 3.6 * safeGetNumber(info.averageSpeed);
         mOverallData.PaceInMinsPerKm = mLapCurrentData.SpeedInKmsPerHour == 0 ? 0 : 60 / mLapCurrentData.SpeedInKmsPerHour;
         mOverallData.HeartRate = safeGetNumber(info.averageHeartRate);
         mOverallData.ElapsedSeconds = safeGetNumber(info.elapsedTime) / 1000;

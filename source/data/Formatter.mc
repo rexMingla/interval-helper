@@ -18,13 +18,14 @@ module data {
             return "--";
         }
 
-        static function getPace(kmsPerHour) {
+        // 5.17 -> 5:10
+        static function getPace(unitPerHour) {
             try {
-                var mins = 60 * ((100 * kmsPerHour) % 100) / 100;
-                return getTime(kmsPerHour, mins);
+                var mins = 60 * ((100 * unitPerHour).toNumber() % 100) / 100;
+                return getTime(unitPerHour, mins);
             } catch (ex) {
             }
-            return "--";
+            return "-:--";
         }
 
         static function getTimeFromSecs(secs) {

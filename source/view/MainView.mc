@@ -45,8 +45,8 @@ module view {
             var todString = data.Formatter.getTime(now.hour, now.min);
 
             if (data.LapNumber == 0) {
-                var welcomeString = Lang.format("Press Start To Begin\nGPS signal: $1$", [getGpsAccuracy(data)]);
-                dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
+                var welcomeString = Lang.format("Press Start To Begin\nGPS Signal: $1$", [getGpsAccuracy(data)]);
+                dc.setColor(data.GpsAccuracy == Position.QUALITY_GOOD ? Graphics.COLOR_GREEN : Graphics.COLOR_ORANGE, Graphics.COLOR_TRANSPARENT);
                 drawTextAndData(dc, welcomeString, "", mDetails.CentreColumn, mDetails.TopRow);
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             } else {
