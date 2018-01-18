@@ -13,7 +13,7 @@ class Controller {
     function initialize() {
         mTimer = new Timer.Timer();
         mModel = Application.getApp().model;
-        mIsSilent = true;
+        mIsSilent = false; // TODO: move to config
     }
 
     function setActivity(activity) {

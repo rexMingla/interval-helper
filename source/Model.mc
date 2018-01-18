@@ -15,10 +15,13 @@ class Model
     hidden var mStartOfLapDistanceInKms;
     hidden var mActivity;
     hidden var mIsRunning;
+    hidden var mPaceConversion;
 
     hidden var mGpsAccuracy;
     hidden var mLapCurrentData;
     hidden var mOverallData;
+
+    hidden const KmsToMiles = 0.6213;
 
     enum {
        Lap,
@@ -46,6 +49,8 @@ class Model
         mLapCurrentData = new data.ViewDataset();
         mOverallData = new data.ViewDataset();
         mGpsAccuracy = null;
+
+        mPaceConversion = System.getDeviceSettings().paceUnits == System.UNIT_METRIC ? 1 : KmsToMiles;
     }
 
     function setActivity(activity) {
@@ -117,8 +122,8 @@ class Model
         mLapCurrentData.IsActive = isActiveLap();
         mLapCurrentData.LapNumber = (getLap() + 1) / 2;
         // currentSpeed = metres / sec
-        mLapCurrentData.SpeedInKmsPerHour = 3.6 * safeGetNumber(info.currentSpeed);
-        mLapCurrentData.PaceInMinsPerKm = mLapCurrentData.SpeedInKmsPerHour == 0 ? 0 : 60 / mLapCurrentData.SpeedInKmsPerHour;
+        mLapCurrentData.Speed = mPaceConversion * 3.6 * safeGetNumber(info.currentSpeed);
+        mLapCurrentData.Pace = mLapCurrentData.Speed == 0 ? 0 : 60 / mLapCurrentData.Speed;
         mLapCurrentData.HeartRate = safeGetNumber(info.currentHeartRate);
         mLapCurrentData.ElapsedSeconds = mLapSeconds;
         mLapCurrentData.DistanceInKms = (safeGetNumber(info.elapsedDistance) / 1000) - mStartOfLapDistanceInKms;
@@ -133,8 +138,8 @@ class Model
         mOverallData.IsActive = isActiveLap();
         mOverallData.LapNumber = (getLap() + 1) / 2;
         // currentSpeed = metres / sec
-        mOverallData.SpeedInKmsPerHour = 3.6 * safeGetNumber(info.averageSpeed);
-        mOverallData.PaceInMinsPerKm = mLapCurrentData.SpeedInKmsPerHour == 0 ? 0 : 60 / mLapCurrentData.SpeedInKmsPerHour;
+        mOverallData.Speed = mPaceConversion * 3.6 * safeGetNumber(info.averageSpeed);
+        mOverallData.Pace = mLapCurrentData.Speed == 0 ? 0 : 60 / mLapCurrentData.Speed;
         mOverallData.HeartRate = safeGetNumber(info.averageHeartRate);
         mOverallData.ElapsedSeconds = safeGetNumber(info.elapsedTime) / 1000;
         mOverallData.DistanceInKms = safeGetNumber(info.elapsedDistance) / 1000;
