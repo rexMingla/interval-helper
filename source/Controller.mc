@@ -8,12 +8,15 @@ class Controller {
     private var mModel;
     private var mTimer;
     private var mIsShowingLapSummaryView;
-    private var mIsSilent;
+    private var mIsTonesOn;
+    private var mIsVibrateOn;
 
     function initialize() {
         mTimer = new Timer.Timer();
         mModel = Application.getApp().model;
-        mIsSilent = false; // TODO: move to config
+        var settings = System.getDeviceSettings();
+        mIsVibrateOn = settings.vibrateOn;
+        mIsTonesOn = settings.tonesOn;
     }
 
     function setActivity(activity) {
@@ -121,10 +124,10 @@ class Controller {
         if (mIsSilent) {
             return;
         }
-        if (Attention has :playTone) {
+        if (Attention has :playTone && mIsTonesOn) {
             Attention.playTone(tone);
         }
-        if (Attention has :vibrate) {
+        if (Attention has :vibrate && mIsTonesOn) {
             Attention.vibrate([new Attention.VibeProfile(50, 1000)]);
         }
     }
