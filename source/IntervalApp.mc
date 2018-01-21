@@ -3,13 +3,13 @@ using Toybox.WatchUi as Ui;
 
 class IntervalApp extends App.AppBase {
 
-    var model;
-    var controller;
+    hidden var _model;
+    hidden var _controller;
 
     function initialize() {
         AppBase.initialize();
-        model = new $.Model();
-        controller = new $.Controller();
+        _model = new $.Model();
+        _controller = new $.Controller();
     }
 
     function onStart(state) {
@@ -20,5 +20,13 @@ class IntervalApp extends App.AppBase {
 
     function getInitialView() {
         return [ new view.MainView(), new delegate.MainDelegate() ];
+    }
+
+    function getController() {
+        return _controller;
+    }
+
+    function getModel() {
+        return _model;
     }
 }

@@ -7,29 +7,28 @@ using Toybox.ActivityRecording;
 
 class Model
 {
-    hidden var mTimer;
-    hidden var mSession;
-    hidden var mLapTimer;
-    hidden var mLap;
-    hidden var mLapSeconds;
-    hidden var mStartOfLapDistanceInKms;
-    hidden var mActivity;
-    hidden var mIsRunning;
-    hidden var mPaceConversion;
+    hidden var _timer;
+    hidden var _session;
+    hidden var _lapTimer;
+    hidden var _lap;
+    hidden var _lapSeconds;
+    hidden var _startOfLapDistance;
+    hidden var _activity;
+    hidden var _isRunning;
+    hidden var _speedConversion;
 
-    hidden var mGpsAccuracy;
-    hidden var mLapCurrentData;
-    hidden var mOverallData;
+    hidden var _lapCurrentData;
+    hidden var _overallData;
 
-    hidden const KmsToMiles = 0.6213;
+    hidden var _views = [Lap, Total];
+    hidden var _currentViewIndex;
+
+    hidden const KmsToMiles = 0.621371;
 
     enum {
        Lap,
        Total
     }
-
-    hidden var mViews = [Lap, Total];
-    hidden var mCurrentViewIndex;
 
     hidden static var mAllSensorsByActivityType = {
         ActivityRecording.SPORT_RUNNING => [Sensor.SENSOR_HEARTRATE, Sensor.SENSOR_FOOTPOD, Sensor.SENSOR_TEMPERATURE],
@@ -39,130 +38,128 @@ class Model
     };
 
     function initialize() {
-        mLap = 0;
-        mLapSeconds = 0;
-        mStartOfLapDistanceInKms = 0;
-        mCurrentViewIndex = 0;
-        mActivity = null;
+        _lap = 0;
+        _lapSeconds = 0;
+        _startOfLapDistance = 0;
+        _currentViewIndex = 0;
+        _activity = null;
         Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:positionCallback));
         setActivity(ActivityRecording.SPORT_RUNNING);
-        mLapCurrentData = new data.ViewDataset();
-        mOverallData = new data.ViewDataset();
-        mGpsAccuracy = null;
-
-        mPaceConversion = System.getDeviceSettings().paceUnits == System.UNIT_METRIC ? 1 : KmsToMiles;
+        _lapCurrentData = new data.ViewDataset();
+        _overallData = new data.ViewDataset();
+        _speedConversion = System.getDeviceSettings().paceUnits == System.UNIT_METRIC ? 1 : KmsToMiles;
     }
 
-    function setActivity(activity) {
-        mActivity = activity;
-        Sensor.setEnabledSensors(mAllSensorsByActivityType[mActivity]);
+    function setActivity(_activity) {
+        _activity = _activity;
+        Sensor.setEnabledSensors(mAllSensorsByActivityType[_activity]);
     }
 
     function start() {
         if (!hasStarted()) {
-            mSession = ActivityRecording.createSession({:sport=>mActivity, :name=>"Intervals"});
-            mLap = 1;
-            mLapTimer = new Timer.Timer();
-            mLapTimer.start(method(:lapCallback), 1000, true);
+            _session = ActivityRecording.createSession({:sport=>_activity, :name=>"Intervals"});
+            _lap = 1;
+            _lapTimer = new Timer.Timer();
+            _lapTimer.start(method(:lapCallback), 1000, true);
         }
-        mSession.start();
-        mIsRunning = true;
+        _session.start();
+        _isRunning = true;
     }
 
     function stop() {
-        mLapTimer.stop();
-        mSession.stop();
-        mIsRunning = false;
+        _lapTimer.stop();
+        _session.stop();
+        _isRunning = false;
     }
 
     function resume() {
-        mSession.start();
-        mLapTimer.start(method(:lapCallback), 1000, true);
-        mIsRunning = true;
+        _session.start();
+        _lapTimer.start(method(:lapCallback), 1000, true);
+        _isRunning = true;
     }
 
-    // creates a lap. if it is an odd lap the sensor data is turned off
+    // creates a _lap. if it is an odd _lap the sensor data is turned off
     function startLap() {
-        mLap++;
-        mLapSeconds = 0;
-        mLapTimer.stop();
-        mSession.addLap();
+        _lap++;
+        _lapSeconds = 0;
+        _lapTimer.stop();
+        _session.addLap();
         if (isActiveLap()) {
             Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:positionCallback));
         } else {
             Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:positionCallback));
         }
         var info = Activity.getActivityInfo();
-        mStartOfLapDistanceInKms = safeGetNumber(info.elapsedDistance) / 1000;
-        mLapTimer.start(method(:lapCallback), 1000, true);
+        _startOfLapDistance = safeGetNumber(info.elapsedDistance) / 1000;
+        _lapTimer.start(method(:lapCallback), 1000, true);
     }
 
     function hasStarted() {
-        return mLap > 0;
+        return _lap > 0;
     }
 
     function isActiveLap() {
-        return (mLap % 2) == 1;
+        return (_lap % 2) == 1;
     }
 
     function isRunning() {
-        return mIsRunning;
+        return _isRunning;
     }
 
     function save() {
-        mSession.save();
+        _session.save();
     }
 
     function discard() {
-        mSession.discard();
+        _session.discard();
     }
 
     function getLapData() {
         var info = Activity.getActivityInfo();
-        mLapCurrentData.IsActive = isActiveLap();
-        mLapCurrentData.LapNumber = (getLap() + 1) / 2;
+        _lapCurrentData.IsActive = isActiveLap();
+        _lapCurrentData.LapNumber = (getLap() + 1) / 2;
         // currentSpeed = metres / sec
-        mLapCurrentData.Speed = mPaceConversion * 3.6 * safeGetNumber(info.currentSpeed);
-        mLapCurrentData.Pace = mLapCurrentData.Speed == 0 ? 0 : 60 / mLapCurrentData.Speed;
-        mLapCurrentData.HeartRate = safeGetNumber(info.currentHeartRate);
-        mLapCurrentData.ElapsedSeconds = mLapSeconds;
-        mLapCurrentData.DistanceInKms = (safeGetNumber(info.elapsedDistance) / 1000) - mStartOfLapDistanceInKms;
-        mLapCurrentData.GpsAccuracy = info.currentLocationAccuracy;
-        mLapCurrentData.Activity = mActivity;
+        _lapCurrentData.Speed = _speedConversion * 3.6 * safeGetNumber(info.currentSpeed);
+        _lapCurrentData.Pace = _lapCurrentData.Speed == 0 ? 0 : 60 / _lapCurrentData.Speed;
+        _lapCurrentData.HeartRate = safeGetNumber(info.currentHeartRate);
+        _lapCurrentData.ElapsedSeconds = _lapSeconds;
+        _lapCurrentData.DistanceInKms = (safeGetNumber(info.elapsedDistance) / 1000) - _startOfLapDistance;
+        _lapCurrentData.GpsAccuracy = info.currentLocationAccuracy;
+        _lapCurrentData.Activity = _activity;
 
-        return mLapCurrentData;
+        return _lapCurrentData;
     }
 
     function getTotalData() {
         var info = Activity.getActivityInfo();
-        mOverallData.IsActive = isActiveLap();
-        mOverallData.LapNumber = (getLap() + 1) / 2;
+        _overallData.IsActive = isActiveLap();
+        _overallData.LapNumber = (getLap() + 1) / 2;
         // currentSpeed = metres / sec
-        mOverallData.Speed = mPaceConversion * 3.6 * safeGetNumber(info.averageSpeed);
-        mOverallData.Pace = mLapCurrentData.Speed == 0 ? 0 : 60 / mLapCurrentData.Speed;
-        mOverallData.HeartRate = safeGetNumber(info.averageHeartRate);
-        mOverallData.ElapsedSeconds = safeGetNumber(info.elapsedTime) / 1000;
-        mOverallData.DistanceInKms = safeGetNumber(info.elapsedDistance) / 1000;
-        mOverallData.GpsAccuracy = info.currentLocationAccuracy;
-        mOverallData.Activity = mActivity;
+        _overallData.Speed = _speedConversion * 3.6 * safeGetNumber(info.averageSpeed);
+        _overallData.Pace = _lapCurrentData.Speed == 0 ? 0 : 60 / _lapCurrentData.Speed;
+        _overallData.HeartRate = safeGetNumber(info.averageHeartRate);
+        _overallData.ElapsedSeconds = safeGetNumber(info.elapsedTime) / 1000;
+        _overallData.DistanceInKms = safeGetNumber(info.elapsedDistance) / 1000;
+        _overallData.GpsAccuracy = info.currentLocationAccuracy;
+        _overallData.Activity = _activity;
 
-        return mOverallData;
+        return _overallData;
     }
 
     private function getLap() {
-        return mLap;
+        return _lap;
     }
 
     function getCurrentView() {
-        return mViews[mCurrentViewIndex];
+        return _views[_currentViewIndex];
     }
 
     function cycleView(offset) {
-        mCurrentViewIndex = (mViews.size() + mCurrentViewIndex + offset) % mViews.size();
+        _currentViewIndex = (_views.size() + _currentViewIndex + offset) % _views.size();
     }
 
     private function lapCallback() {
-        mLapSeconds++;
+        _lapSeconds++;
     }
 
     private function safeGetNumber(n) {

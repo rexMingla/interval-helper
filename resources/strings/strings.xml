@@ -1,6 +1,7 @@
 <strings>
     <string id="AppName">Interval Helper</string>
 
+    <!-- menus -->
     <string id="menu_start_start">Start</string>
     <string id="menu_start_select">Select Activity</string>
 
@@ -13,5 +14,28 @@
     <string id="menu_activity_run">Run</string>
     <string id="menu_activity_bike">Bike</string>
     <string id="menu_activity_swim">Swim</string>
-    <string id="menu_activity_other">Other</string>  
+    <string id="menu_activity_other">Other</string>
+    
+    <!-- labels -->
+    <string id="view_time_of_day">Time</string>
+    <!-- lap labels -->
+    <string id="view_lap_dist">Lap Dist</string>
+    <string id="view_current_hr">Curr HR</string>
+    <string id="view_lap_time">Lap Time</string>
+    <string id="view_current_pace">Curr Pace</string>
+    <string id="view_current_speed">Curr Speed</string>
+    <!-- total labels -->
+    <string id="view_total_dist">Total Dist</string>
+    <string id="view_average_hr">Avg HR</string>
+    <string id="view_total_time">Total Time</string>
+    <string id="view_average_pace">Avg Pace</string>
+    <string id="view_average_speed">Avg Speed</string> 
+    <!-- gps labels -->
+    <string id="gps_good">Good</string> 
+    <string id="gps_ok">OK</string>
+    <string id="gps_poor">Poor</string>
+    <!-- lap labels -->
+    <string id="lap_on">On</string>
+    <string id="lap_off">Off</string>
+    <string id="welcome_format">GPS Signal: $1$\nPress Start To Begin</string>
 </strings>

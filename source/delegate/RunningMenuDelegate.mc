@@ -6,23 +6,23 @@ using Toybox.Timer;
 module delegate {
     class RunningMenuDelegate extends Ui.MenuInputDelegate {
 
-        hidden var mController;
+        hidden var _controller;
 
         function initialize() {
             MenuInputDelegate.initialize();
-            mController = Application.getApp().controller;
+            _controller = Application.getApp().getController();
         }
 
         // Handle the menu input
         function onMenuItem(item) {
             if (item == :resume) {
-                mController.resume();
+                _controller.resume();
                 return true;
             } else if (item == :save) {
-                mController.save();
+                _controller.save();
                 return true;
             } else {
-                mController.discard();
+                _controller.discard();
                 return true;
             }
             return false;

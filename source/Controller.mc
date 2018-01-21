@@ -5,57 +5,57 @@ using Toybox.System;
 using Toybox.Attention;
 
 class Controller {
-    private var mModel;
-    private var mTimer;
-    private var mIsShowingLapSummaryView;
-    private var mIsTonesOn;
-    private var mIsVibrateOn;
+    hidden var _model;
+    hidden var _timer;
+    hidden var _isShowingLapSummaryView;
+    hidden var _isTonesOn;
+    hidden var _vibrateOn;
 
     function initialize() {
-        mTimer = new Timer.Timer();
-        mModel = Application.getApp().model;
+        _timer = new Timer.Timer();
+        _model = Application.getApp().getModel();
         var settings = System.getDeviceSettings();
-        mIsVibrateOn = settings.vibrateOn;
-        mIsTonesOn = settings.tonesOn;
+        _vibrateOn = settings.vibrateOn;
+        _isTonesOn = settings.tonesOn;
     }
 
     function setActivity(activity) {
-        mModel.setActivity(activity);
+        _model.setActivity(activity);
     }
 
     function start() {
-        performAttention(Attention.TONE_START);
-        mModel.start();
+        performAttention(Attention has :TONE_START ? Attention.TONE_START : null);
+        _model.start();
     }
 
     function resume() {
-        performAttention(Attention.TONE_START);
-        mModel.resume();
+        performAttention(Attention has :TONE_START ? Attention.TONE_START : null);
+        _model.resume();
     }
 
     function stop() {
-        performAttention(Attention.TONE_STOP);
-        mModel.stop();
+        performAttention(Attention has :TONE_STOP ? Attention.TONE_STOP : null);
+        _model.stop();
     }
 
     function save() {
-        performAttention(Attention.TONE_KEY);
-        mModel.save();
+        performAttention(Attention has :TONE_KEY ? Attention.TONE_KEY : null);
+        _model.save();
         // Give the system some time to finish the recording. Push up a progress bar
-        // and start a timer to allow all processing to finish
+        // and start a _timer to allow all processing to finish
         WatchUi.pushView(new WatchUi.ProgressBar("Saving...", null), new delegate.ProgressDelegate(), WatchUi.SLIDE_DOWN);
-        mTimer.stop();
-        mTimer.start(method(:onExit), 3000, false);
+        _timer.stop();
+        _timer.start(method(:onExit), 3000, false);
     }
 
     function discard() {
-        performAttention(Attention.TONE_KEY);
-        mModel.discard();
+        performAttention(Attention has :TONE_KEY ? Attention.TONE_KEY : null);
+        _model.discard();
         // Give the system some time to discard the recording. Push up a progress bar
-        // and start a timer to allow all processing to finish
+        // and start a _timer to allow all processing to finish
         WatchUi.pushView(new WatchUi.ProgressBar("Discarding...", null), new delegate.ProgressDelegate(), WatchUi.SLIDE_DOWN);
-        mTimer.stop();
-        mTimer.start(method(:onExit), 3000, false);
+        _timer.stop();
+        _timer.start(method(:onExit), 3000, false);
     }
 
     // Handle the start/stop button
@@ -79,36 +79,36 @@ class Controller {
     }
 
     function isActiveLap() {
-        return mModel.isActiveLap();
+        return _model.isActiveLap();
     }
 
     function isRunning() {
-        return mModel.isRunning();
+        return _model.isRunning();
     }
 
     function hasStarted() {
-        return mModel.hasStarted();
+        return _model.hasStarted();
     }
 
     function onLap() {
-        performAttention(Attention.TONE_LAP);
-        var data = mModel.getLapData().clone();
-        mModel.startLap();
+        performAttention(Attention has :TONE_LAP ? Attention.TONE_LAP : null);
+        var data = _model.getLapData().clone();
+        _model.startLap();
 
-        mTimer.stop();
-        if (mIsShowingLapSummaryView) {
+        _timer.stop();
+        if (_isShowingLapSummaryView) {
             WatchUi.switchToView(new view.LapSummaryView(data), new delegate.LapSummaryDelegate(), WatchUi.SLIDE_UP);
         } else {
             WatchUi.pushView(new view.LapSummaryView(data), new delegate.LapSummaryDelegate(), WatchUi.SLIDE_UP);
         }
-        mIsShowingLapSummaryView = true;
-        mTimer.start(method(:hideLapSummaryView), 5000, false);
+        _isShowingLapSummaryView = true;
+        _timer.start(method(:hideLapSummaryView), 5000, false);
     }
 
     function hideLapSummaryView() {
-        if (mIsShowingLapSummaryView) {
+        if (_isShowingLapSummaryView) {
             WatchUi.popView(WatchUi.SLIDE_DOWN);
-            mIsShowingLapSummaryView = false;
+            _isShowingLapSummaryView = false;
         }
     }
 
@@ -117,17 +117,14 @@ class Controller {
     }
 
     function cycleView(offset) {
-        mModel.cycleView(offset);
+        _model.cycleView(offset);
     }
 
     function performAttention(tone) {
-        if (mIsSilent) {
-            return;
-        }
-        if (Attention has :playTone && mIsTonesOn) {
+        if (Attention has :playTone && _isTonesOn && tone != null) {
             Attention.playTone(tone);
         }
-        if (Attention has :vibrate && mIsTonesOn) {
+        if (Attention has :vibrate && _isTonesOn) {
             Attention.vibrate([new Attention.VibeProfile(50, 1000)]);
         }
     }

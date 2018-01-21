@@ -6,33 +6,35 @@ using Toybox.Graphics;
 
 module view {
     class MainView extends Ui.View {
-        hidden var mModel;
-        hidden var mTimer;
-        hidden var mDetails;
+        hidden var _model;
+        hidden var _timer;
+        hidden var _posDetails;
+        hidden var _timeDisplayModulus;
 
         function initialize() {
             View.initialize();
-            mModel = Application.getApp().model;
-            mTimer = new Timer.Timer();
+            _model = Application.getApp().getModel();
+            _timer = new Timer.Timer();
+            _timeDisplayModulus = System.getDeviceSettings().is24Hour ? 24 : 12;
         }
 
         function onLayout(dc) {
-            mDetails = data.PositionDetails.createFromDataContext(dc);
+            _posDetails = data.PositionDetails.createFromDataContext(dc);
         }
 
         function onShow() {
-            mTimer.start(method(:onTimer), 1000, true);
+            _timer.start(method(:onTimer), 1000, true);
         }
 
         // Update the view
         function onUpdate(dc) {
             View.onUpdate(dc);
 
-            var view = mModel.getCurrentView();
+            var view = _model.getCurrentView();
             var labels = view == Model.Lap ? data.Labels.Lap : data.Labels.Total;
-            var data = view == Model.Lap ? mModel.getLapData() : mModel.getTotalData();
+            var data = view == Model.Lap ? _model.getLapData() : _model.getTotalData();
 
-            var lapLabelString = data.IsActive ? "On" : "Off";
+            var lapLabelString = data.IsActive ? Ui.loadResource(Rez.Strings.lap_on) : Ui.loadResource(Rez.Strings.lap_off);
             var lapNumberString = data.Formatter.getInt(data.LapNumber);
             var paceLabel = data.Activity == ActivityRecording.SPORT_CYCLING ? labels.Speed : labels.Pace;
             var paceString = data.Activity == ActivityRecording.SPORT_CYCLING
@@ -42,54 +44,52 @@ module view {
             var hrString = data.Formatter.getInt(data.HeartRate);
             var timeString = data.Formatter.getTimeFromSecs(data.ElapsedSeconds);
             var now = System.getClockTime();
-            var todString = data.Formatter.getTime(now.hour, now.min);
+            var todString = data.Formatter.getTime(now.hour % _timeDisplayModulus, now.min);
 
             if (data.LapNumber == 0) {
-                var welcomeString = Lang.format("Press Start To Begin\nGPS Signal: $1$", [getGpsAccuracy(data)]);
+                var welcomeString = Lang.format(Ui.loadResource(Rez.Strings.welcome_format), [getGpsAccuracy(data)]);
                 dc.setColor(data.GpsAccuracy == Position.QUALITY_GOOD ? Graphics.COLOR_GREEN : Graphics.COLOR_ORANGE, Graphics.COLOR_TRANSPARENT);
-                drawTextAndData(dc, welcomeString, "", mDetails.CentreColumn, mDetails.TopRow);
+                drawTextAndData(dc, welcomeString, "", _posDetails.CentreColumn, _posDetails.TopRow);
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             } else {
                 var lapColour = data.IsActive ? Graphics.COLOR_GREEN : Graphics.COLOR_RED;
                 dc.setColor(lapColour, Graphics.COLOR_TRANSPARENT);
-                drawTextAndData(dc, lapLabelString, lapNumberString, mDetails.LeftColumn, mDetails.TopRow);
+                drawTextAndData(dc, lapLabelString, lapNumberString, _posDetails.LeftColumn, _posDetails.TopRow);
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-                drawTextAndData(dc, labels.Distance, distString, mDetails.RightColumn, mDetails.TopRow);
+                drawTextAndData(dc, labels.Distance, distString, _posDetails.RightColumn, _posDetails.TopRow);
             }
 
-            drawTextAndData(dc, paceLabel, paceString, mDetails.LeftColumn, mDetails.CentreRow);
-            drawTextAndData(dc, labels.Time, timeString, mDetails.RightColumn, mDetails.CentreRow);
+            drawTextAndData(dc, paceLabel, paceString, _posDetails.LeftColumn, _posDetails.CentreRow);
+            drawTextAndData(dc, labels.Time, timeString, _posDetails.RightColumn, _posDetails.CentreRow);
 
-            drawTextAndData(dc, "Time", todString, mDetails.LeftColumn, mDetails.BottomRow);
-            drawTextAndData(dc, labels.Hr, hrString, mDetails.RightColumn, mDetails.BottomRow);
+            drawTextAndData(dc, labels.Hr, hrString, _posDetails.LeftColumn, _posDetails.BottomRow);
+            drawTextAndData(dc, labels.TimeOfDay, todString, _posDetails.RightColumn, _posDetails.BottomRow);
         }
 
         private function drawTextAndData(dc, label, data, x, y) {
-            dc.drawText(x, y - mDetails.DataHeight / 2, mDetails.LabelFont, label, Graphics.TEXT_JUSTIFY_CENTER);
-            if (data != "") {
-                dc.drawText(x, y, mDetails.DataFont, data, Graphics.TEXT_JUSTIFY_CENTER);
-            }
+            dc.drawText(x, y - _posDetails.DataAndLabelOffset, _posDetails.LabelFont, label, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(x, y, _posDetails.DataFont, data, Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         // Called when this View is removed from the screen. Save the
         // state of this View here. This includes freeing resources from
         // memory.
         function onHide() {
-            mTimer.stop();
+            _timer.stop();
         }
 
-        // Handler for the timer callback
+        // Handler for the _timer callback
         function onTimer() {
             Ui.requestUpdate();
         }
 
         private function getGpsAccuracy(data) {
             if (data.GpsAccuracy == Position.QUALITY_GOOD) {
-                return "Good";
+                return Ui.loadResource(Rez.Strings.gps_good);
             } else if (data.GpsAccuracy == Position.QUALITY_USABLE) {
-                return "Ok";
+                return Ui.loadResource(Rez.Strings.gps_ok);
             }
-            return "Poor";
+            return Ui.loadResource(Rez.Strings.gps_poor);
         }
     }
 }

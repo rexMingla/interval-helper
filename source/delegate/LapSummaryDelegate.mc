@@ -4,23 +4,24 @@ using Toybox.Application;
 
 module delegate {
     class LapSummaryDelegate extends Ui.BehaviorDelegate {
-        private var mController;
+
+        private var _controller;
 
         function initialize() {
             BehaviorDelegate.initialize();
-            mController = Application.getApp().controller;
+            _controller = Application.getApp().getController();
         }
 
         // Input handling of start/stop is mapped to onSelect
         function onSelect() {
-            mController.hideLapSummaryView();
-            mController.onStartStop();
+            _controller.hideLapSummaryView();
+            _controller.onStartStop();
             return true;
         }
 
         // start lap
         function onBack() {
-            mController.onLap();
+            _controller.onLap();
             return true;
         }
 
@@ -30,11 +31,11 @@ module delegate {
         }
 
         function onNextPage() {
-            mController.hideLapSummaryView();
+            _controller.hideLapSummaryView();
         }
 
         function onPreviousPage() {
-            mController.hideLapSummaryView();
+            _controller.hideLapSummaryView();
         }
     }
 }

@@ -8,20 +8,20 @@ module delegate {
     // selects the sport
     class StartMenuDelegate extends Ui.MenuInputDelegate {
 
-        hidden var mController;
+        hidden var _controller;
 
         function initialize() {
             MenuInputDelegate.initialize();
-            mController = Application.getApp().controller;
+            _controller = Application.getApp().getController();
         }
 
         // Handle the menu input
         function onMenuItem(item) {
             if (item == :start) {
-                mController.start();
+                _controller.start();
                 return true;
             } else if (item == :select) {
-                mController.onSelectActivity();
+                _controller.onSelectActivity();
                 return true;
             }
             return false;

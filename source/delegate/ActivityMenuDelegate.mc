@@ -8,26 +8,26 @@ using Toybox.Timer;
 module delegate {
     class ActivityMenuDelegate extends Ui.MenuInputDelegate {
 
-        hidden var mController;
+        hidden var _controller;
 
         function initialize() {
             MenuInputDelegate.initialize();
-            mController = Application.getApp().controller;
+            _controller = Application.getApp().getController();
         }
 
         // Handle the menu input
         function onMenuItem(item) {
             if (item == :run) {
-                mController.setActivity(ActivityRecording.SPORT_RUNNING);
+                _controller.setActivity(ActivityRecording.SPORT_RUNNING);
                 return true;
             } else if (item == :bike) {
-                mController.setActivity(ActivityRecording.SPORT_CYCLING);
+                _controller.setActivity(ActivityRecording.SPORT_CYCLING);
                 return true;
             } else if (item == :swim) {
-                mController.setActivity(ActivityRecording.SPORT_SWIMMING);
+                _controller.setActivity(ActivityRecording.SPORT_SWIMMING);
                 return true;
             } else {
-                mController.setActivity(ActivityRecording.SPORT_GENERIC);
+                _controller.setActivity(ActivityRecording.SPORT_GENERIC);
                 return true;
             }
             return false;

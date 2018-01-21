@@ -12,7 +12,7 @@ module data {
 
         static function getFloat(n) {
             try {
-                return n.format("%0.2f");
+                return n.format("%0.1f");
             } catch (ex) {
             }
             return "--";
