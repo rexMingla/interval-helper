@@ -48,6 +48,7 @@ class Model
         _lapCurrentData = new data.ViewDataset();
         _overallData = new data.ViewDataset();
         _speedConversion = System.getDeviceSettings().paceUnits == System.UNIT_METRIC ? 1 : KmsToMiles;
+        _isRunning = false;
     }
 
     function setActivity(_activity) {
@@ -126,6 +127,7 @@ class Model
         _lapCurrentData.DistanceInKms = (safeGetNumber(info.elapsedDistance) / 1000) - _startOfLapDistance;
         _lapCurrentData.GpsAccuracy = info.currentLocationAccuracy;
         _lapCurrentData.Activity = _activity;
+        _lapCurrentData.IsRunning = isRunning();
 
         return _lapCurrentData;
     }
@@ -142,6 +144,7 @@ class Model
         _overallData.DistanceInKms = safeGetNumber(info.elapsedDistance) / 1000;
         _overallData.GpsAccuracy = info.currentLocationAccuracy;
         _overallData.Activity = _activity;
+        _overallData.IsRunning = isRunning();
 
         return _overallData;
     }

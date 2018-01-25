@@ -46,8 +46,9 @@ module view {
             var now = System.getClockTime();
             var todString = data.Formatter.getTime(now.hour % _timeDisplayModulus, now.min);
 
-            if (data.LapNumber == 0) {
-                var welcomeString = Lang.format(Ui.loadResource(Rez.Strings.welcome_format), [getGpsAccuracy(data)]);
+            if (!data.IsRunning) {
+                var messageFormat = data.LapNumber == 0 ? Ui.loadResource(Rez.Strings.welcome_format) : Ui.loadResource(Rez.Strings.resume_format);
+                var welcomeString = Lang.format(messageFormat, [getGpsAccuracy(data)]);
                 dc.setColor(data.GpsAccuracy == Position.QUALITY_GOOD ? Graphics.COLOR_GREEN : Graphics.COLOR_ORANGE, Graphics.COLOR_TRANSPARENT);
                 drawTextAndData(dc, welcomeString, "", _posDetails.CentreColumn, _posDetails.TopRow);
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);

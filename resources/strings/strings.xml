@@ -38,4 +38,5 @@
     <string id="lap_on">On</string>
     <string id="lap_off">Off</string>
     <string id="welcome_format">GPS Signal: $1$\nPress Start To Begin</string>
+    <string id="resume_format">GPS Signal: $1$\nPress Start To Resume</string>
 </strings>

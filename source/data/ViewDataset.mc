@@ -9,6 +9,7 @@ module data {
         public var ElapsedSeconds;
         public var GpsAccuracy;
         public var Activity;
+        public var IsRunning;
 
         function initialize() {
             LapNumber = 0;
@@ -20,6 +21,7 @@ module data {
             ElapsedSeconds = 0;
             GpsAccuracy = null;
             Activity = null;
+            IsRunning = false;
         }
 
         function clone() {
@@ -33,6 +35,7 @@ module data {
             ret.ElapsedSeconds = ElapsedSeconds;
             ret.GpsAccuracy = GpsAccuracy;
             ret.Activity = Activity;
+            ret.IsRunning = IsRunning;
             return ret;
         }
     }
