@@ -25,7 +25,7 @@ module delegate {
                 return true;
             }
             if (!_controller.isRunning()) {
-                return false;
+                return true;
             }
             _controller.onLap();
             return true;
