@@ -118,6 +118,7 @@ class Controller {
 
     function cycleView(offset) {
         _model.cycleView(offset);
+        WatchUi.requestUpdate();
     }
 
     function performAttention(tone) {
