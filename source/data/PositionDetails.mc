@@ -18,9 +18,7 @@ module data {
         public var BottomRow;
 
         static function createFromDataContext(dc) {
-            // hacky way to get 735xt to use larger fonts than the fenix
-            // reference: https://developer.garmin.com/connect-iq/user-experience-guide/appendices/
-            var useSmallerFonts = dc.getFontHeight(dc.FONT_SMALL) > 19;
+            var useSmallerFonts = needsSmallFont(dc);
 
             var details = new PositionDetails();
             details.Width = dc.getWidth();
@@ -29,22 +27,39 @@ module data {
             details.DataHeight = dc.getFontHeight(details.DataFont);
             details.LabelFont = useSmallerFonts ? dc.FONT_XTINY : dc.FONT_SMALL;
             details.LabelHeight = dc.getFontHeight(details.LabelFont);
-            details.DataAndLabelOffset = details.LabelHeight - 5;
+            details.DataAndLabelOffset = getLabelOffset(details.LabelHeight, dc);
 
-            var yOffset = 10;
-            details.LeftColumn = details.Width / 3 - yOffset;
-            details.RightColumn = 2 * details.Width / 3 + yOffset;
+            var xOffset = 10;
+            details.LeftColumn = details.Width / 3 - xOffset;
+            details.RightColumn = 2 * details.Width / 3 + xOffset;
             details.CentreColumn = details.Width / 2;
 
-            details.TopRow = getTopOffset();
+            details.TopRow = getTopOffset(dc);
             details.BottomRow = details.Height - details.TopRow;
             details.CentreRow = details.Height / 2;
             return details;
         }
 
-        private static function getTopOffset() {
+        private static function getLabelOffset(labelHeight, dc) {
+            return labelHeight - getTopOffset(dc) / 10;
+        }
+
+        private static function needsSmallFont(dc) {
+            // reference: https://developer.garmin.com/connect-iq/user-experience-guide/appendices/
+            // hacky way to get 735xt to use larger fonts than the fenix
+            return dc.getFontHeight(dc.FONT_SMALL) > 19;
+        }
+
+        private static function getTopOffset(dc) {
+            if (isShortScreen(dc)) {
+                return 25;
+            }
             var screenShape = System.getDeviceSettings().screenShape;
             return screenShape == System.SCREEN_SHAPE_ROUND ? 50 : 40;
+        }
+
+        private static function isShortScreen(dc) {
+            return dc.getHeight() == 148;
         }
     }
 }
