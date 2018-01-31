@@ -10,9 +10,10 @@ module data {
             return "--";
         }
 
-        static function getFloat(n) {
+        static function getFloat(n, dp) {
             try {
-                return n.format("%0.1f");
+                var format = Lang.format("$1$$2$f", ["%0.", dp.format("%d")]);
+                return n.format(format);
             } catch (ex) {
             }
             return "--";
@@ -33,7 +34,7 @@ module data {
                 return getTime(secs / 60, secs % 60);
             } catch (ex) {
             }
-            return "--";
+            return "-:--";
         }
 
         static function getTime(hours, mins) {
@@ -41,7 +42,7 @@ module data {
                 return Lang.format("$1$:$2$", [hours.format("%d"), mins.format("%02d")]);
             } catch (ex) {
             }
-            return "--";
+            return "-:--";
         }
     }
 }

@@ -38,9 +38,9 @@ module view {
             var lapNumberString = data.Formatter.getInt(data.LapNumber);
             var paceLabel = data.Activity == ActivityRecording.SPORT_CYCLING ? labels.Speed : labels.Pace;
             var paceString = data.Activity == ActivityRecording.SPORT_CYCLING
-                ? data.Formatter.getFloat(data.Speed)
+                ? data.Formatter.getFloat(data.Speed, 1)
                 : data.Formatter.getPace(data.Pace);
-            var distString = data.Formatter.getFloat(data.DistanceInKms);
+            var distString = data.Formatter.getFloat(data.DistanceInKms, 2);
             var hrString = data.Formatter.getInt(data.HeartRate);
             var timeString = data.Formatter.getTimeFromSecs(data.ElapsedSeconds);
             var now = System.getClockTime();
