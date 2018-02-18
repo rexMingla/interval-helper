@@ -9,13 +9,13 @@ class Controller {
     hidden var _timer;
     hidden var _isShowingLapSummaryView;
     hidden var _isTonesOn;
-    hidden var _vibrateOn;
+    hidden var _isVibrateOn;
 
     function initialize() {
         _timer = new Timer.Timer();
         _model = Application.getApp().getModel();
         var settings = System.getDeviceSettings();
-        _vibrateOn = settings.vibrateOn;
+        _isVibrateOn = settings.vibrateOn;
         _isTonesOn = settings.tonesOn;
     }
 
@@ -125,7 +125,7 @@ class Controller {
         if (Attention has :playTone && _isTonesOn && tone != null) {
             Attention.playTone(tone);
         }
-        if (Attention has :vibrate && _isTonesOn) {
+        if (Attention has :vibrate && _isVibrateOn) {
             Attention.vibrate([new Attention.VibeProfile(50, 1000)]);
         }
     }
