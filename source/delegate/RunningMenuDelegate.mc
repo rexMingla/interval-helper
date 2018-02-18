@@ -6,7 +6,7 @@ using Toybox.Timer;
 module delegate {
     class RunningMenuDelegate extends Ui.MenuInputDelegate {
 
-        hidden var _controller;
+        private var _controller;
 
         function initialize() {
             MenuInputDelegate.initialize();

@@ -36,10 +36,8 @@ module view {
 
             var lapLabelString = data.IsActive ? Ui.loadResource(Rez.Strings.lap_on) : Ui.loadResource(Rez.Strings.lap_off);
             var lapNumberString = data.Formatter.getInt(data.LapNumber);
-            var paceLabel = data.Activity == ActivityRecording.SPORT_CYCLING ? labels.Speed : labels.Pace;
-            var paceString = data.Activity == ActivityRecording.SPORT_CYCLING
-                ? data.Formatter.get1dpFloat(data.Speed, 1)
-                : data.Formatter.getPace(data.Pace);
+            var paceLabel = getPaceLabel(data.Activity, labels);
+            var paceString = getPaceString(data);
             var distString = data.Formatter.get2dpFloat(data.DistanceInKms);
             var hrString = data.Formatter.getInt(data.HeartRate);
             var timeString = data.Formatter.getTimeFromSecs(data.ElapsedSeconds);
@@ -72,11 +70,21 @@ module view {
             dc.drawText(x, y, _posDetails.DataFont, data, Graphics.TEXT_JUSTIFY_CENTER);
         }
 
-        private function getPaceString(activity) {
+        private function getPaceLabel(activity, labels) {
+            if (activity == ActivityRecording.SPORT_CYCLING) {
+                return labels.Speed;
+            }
+            if (activity == ActivityRecording.SPORT_SWIMMING) {
+                return labels.SwimPace;
+            }
+            return labels.Pace;
+        }
+
+        private function getPaceString(data) {
             if (data.Activity == ActivityRecording.SPORT_CYCLING) {
                 return data.Formatter.get1dpFloat(data.Speed);
             }
-            var multiplier = data.Activity == ActivityRecording.SPORT_SWIMMING ? 0.2 : 1.0; // swimming is per 200m
+            var multiplier = data.Activity == ActivityRecording.SPORT_SWIMMING ? 0.1 : 1.0; // swimming is per 100m
             return data.Formatter.getPace(data.Pace * multiplier);
         }
 

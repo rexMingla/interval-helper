@@ -23,12 +23,14 @@
     <string id="view_current_hr">Curr HR</string>
     <string id="view_lap_time">Lap Time</string>
     <string id="view_current_pace">Curr Pace</string>
+    <string id="view_current_swim_pace">Curr 100m</string>
     <string id="view_current_speed">Curr Speed</string>
     <!-- total labels -->
     <string id="view_total_dist">Total Dist</string>
     <string id="view_average_hr">Avg HR</string>
     <string id="view_total_time">Total Time</string>
     <string id="view_average_pace">Avg Pace</string>
+    <string id="view_average_swim_pace">Avg 100m</string>
     <string id="view_average_speed">Avg Speed</string> 
     <!-- gps labels -->
     <string id="gps_good">Good</string> 

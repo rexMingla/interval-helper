@@ -8,7 +8,7 @@ module delegate {
     // selects the sport
     class StartMenuDelegate extends Ui.MenuInputDelegate {
 
-        hidden var _controller;
+        private var _controller;
 
         function initialize() {
             MenuInputDelegate.initialize();

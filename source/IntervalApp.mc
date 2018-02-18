@@ -3,8 +3,8 @@ using Toybox.WatchUi as Ui;
 
 class IntervalApp extends App.AppBase {
 
-    hidden var _model;
-    hidden var _controller;
+    private var _model;
+    private var _controller;
 
     function initialize() {
         AppBase.initialize();
