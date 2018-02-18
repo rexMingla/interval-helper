@@ -38,9 +38,9 @@ module view {
             var lapNumberString = data.Formatter.getInt(data.LapNumber);
             var paceLabel = data.Activity == ActivityRecording.SPORT_CYCLING ? labels.Speed : labels.Pace;
             var paceString = data.Activity == ActivityRecording.SPORT_CYCLING
-                ? data.Formatter.getFloat(data.Speed, 1)
+                ? data.Formatter.get1dpFloat(data.Speed, 1)
                 : data.Formatter.getPace(data.Pace);
-            var distString = data.Formatter.getFloat(data.DistanceInKms, 2);
+            var distString = data.Formatter.get2dpFloat(data.DistanceInKms);
             var hrString = data.Formatter.getInt(data.HeartRate);
             var timeString = data.Formatter.getTimeFromSecs(data.ElapsedSeconds);
             var now = System.getClockTime();
@@ -70,6 +70,14 @@ module view {
         private function drawTextAndData(dc, label, data, x, y) {
             dc.drawText(x, y - _posDetails.DataAndLabelOffset, _posDetails.LabelFont, label, Graphics.TEXT_JUSTIFY_CENTER);
             dc.drawText(x, y, _posDetails.DataFont, data, Graphics.TEXT_JUSTIFY_CENTER);
+        }
+
+        private function getPaceString(activity) {
+            if (data.Activity == ActivityRecording.SPORT_CYCLING) {
+                return data.Formatter.get1dpFloat(data.Speed);
+            }
+            var multiplier = data.Activity == ActivityRecording.SPORT_SWIMMING ? 0.2 : 1.0; // swimming is per 200m
+            return data.Formatter.getPace(data.Pace * multiplier);
         }
 
         // Called when this View is removed from the screen. Save the

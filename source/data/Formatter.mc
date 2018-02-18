@@ -10,10 +10,17 @@ module data {
             return "--";
         }
 
-        static function getFloat(n, dp) {
+        static function get1dpFloat(n) {
             try {
-                var format = Lang.format("$1$$2$f", ["%0.", dp.format("%d")]);
-                return n.format(format);
+                return n.format("%0.1f");
+            } catch (ex) {
+            }
+            return "--";
+        }
+
+        static function get2dpFloat(n) {
+            try {
+                return n.format("%0.2f");
             } catch (ex) {
             }
             return "--";

@@ -51,8 +51,8 @@ class Model
         _isRunning = false;
     }
 
-    function setActivity(_activity) {
-        _activity = _activity;
+    function setActivity(activity) {
+        _activity = activity;
         Sensor.setEnabledSensors(mAllSensorsByActivityType[_activity]);
     }
 

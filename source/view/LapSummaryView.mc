@@ -37,7 +37,7 @@ module view {
             var timeString = data.Formatter.getTimeFromSecs(_data.ElapsedSeconds);
             drawTextAndData(dc, labels.Time, timeString, _posDetails.CentreColumn, _posDetails.CentreRow);
 
-            var distString = data.Formatter.getFloat(_data.DistanceInKms, 2);
+            var distString = data.Formatter.get2dpFloat(_data.DistanceInKms);
             drawTextAndData(dc, labels.Distance, distString, _posDetails.CentreColumn, _posDetails.BottomRow);
         }
 
