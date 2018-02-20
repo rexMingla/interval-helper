@@ -38,7 +38,7 @@ module view {
             var lapNumberString = data.Formatter.getInt(data.LapNumber);
             var paceLabel = getPaceLabel(data.Activity, labels);
             var paceString = getPaceString(data);
-            var distString = data.Formatter.get2dpFloat(data.DistanceInKms);
+            var distString = data.Formatter.get2dpFloat(data.Distance);
             var hrString = data.Formatter.getInt(data.HeartRate);
             var timeString = data.Formatter.getTimeFromSecs(data.ElapsedSeconds);
             var now = System.getClockTime();

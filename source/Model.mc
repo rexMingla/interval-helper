@@ -86,9 +86,9 @@ class Model
         _lapTimer.stop();
         _session.addLap();
         if (isActiveLap()) {
-            Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:positionCallback));
+            _session.stop();
         } else {
-            Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:positionCallback));
+            _session.start();
         }
         var info = Activity.getActivityInfo();
         _startOfLapDistance = safeGetNumber(info.elapsedDistance) / 1000;
@@ -124,7 +124,7 @@ class Model
         _lapCurrentData.Pace = _lapCurrentData.Speed == 0 ? 0 : 60 / _lapCurrentData.Speed;
         _lapCurrentData.HeartRate = safeGetNumber(info.currentHeartRate);
         _lapCurrentData.ElapsedSeconds = _lapSeconds;
-        _lapCurrentData.DistanceInKms = (safeGetNumber(info.elapsedDistance) / 1000) - _startOfLapDistance;
+        _lapCurrentData.Distance = _speedConversion * (safeGetNumber(info.elapsedDistance) / 1000) - _startOfLapDistance;
         _lapCurrentData.GpsAccuracy = info.currentLocationAccuracy;
         _lapCurrentData.Activity = _activity;
         _lapCurrentData.IsRunning = isRunning();
@@ -141,7 +141,7 @@ class Model
         _overallData.Pace = _lapCurrentData.Speed == 0 ? 0 : 60 / _lapCurrentData.Speed;
         _overallData.HeartRate = safeGetNumber(info.averageHeartRate);
         _overallData.ElapsedSeconds = safeGetNumber(info.elapsedTime) / 1000;
-        _overallData.DistanceInKms = safeGetNumber(info.elapsedDistance) / 1000;
+        _overallData.Distance = _speedConversion * safeGetNumber(info.elapsedDistance) / 1000;
         _overallData.GpsAccuracy = info.currentLocationAccuracy;
         _overallData.Activity = _activity;
         _overallData.IsRunning = isRunning();
