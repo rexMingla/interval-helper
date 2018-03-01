@@ -12,6 +12,7 @@ class Model
     hidden var _lapTimer;
     hidden var _lap;
     hidden var _lapSeconds;
+    hidden var _isActive;
     hidden var _startOfLapDistance;
     hidden var _activity;
     hidden var _isRunning;
@@ -39,6 +40,7 @@ class Model
 
     function initialize() {
         _lap = 0;
+        _isActive = true;
         _lapSeconds = 0;
         _startOfLapDistance = 0;
         _currentViewIndex = 0;
@@ -57,14 +59,20 @@ class Model
     }
 
     function start() {
+        onStart();
+        _isRunning = true;
+    }
+
+    private function onStart() {
         if (!hasStarted()) {
             _session = ActivityRecording.createSession({:sport=>_activity, :name=>"Intervals"});
             _lap = 1;
             _lapTimer = new Timer.Timer();
             _lapTimer.start(method(:lapCallback), 1000, true);
         }
+        // force it back on because Garmin turns it off
+        Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:positionCallback));
         _session.start();
-        _isRunning = true;
     }
 
     function stop() {
@@ -74,8 +82,7 @@ class Model
     }
 
     function resume() {
-        _session.start();
-        _lapTimer.start(method(:lapCallback), 1000, true);
+        onStart();
         _isRunning = true;
     }
 
@@ -83,15 +90,16 @@ class Model
     function startLap() {
         _lap++;
         _lapSeconds = 0;
+        _isActive = !_isActive;
+        var info = Activity.getActivityInfo();
+        _startOfLapDistance = safeGetNumber(info.elapsedDistance) / 1000;
         _lapTimer.stop();
         _session.addLap();
         if (isActiveLap()) {
-            _session.stop();
+            onStart();
         } else {
-            _session.start();
+            _session.stop();
         }
-        var info = Activity.getActivityInfo();
-        _startOfLapDistance = safeGetNumber(info.elapsedDistance) / 1000;
         _lapTimer.start(method(:lapCallback), 1000, true);
     }
 
@@ -100,7 +108,7 @@ class Model
     }
 
     function isActiveLap() {
-        return (_lap % 2) == 1;
+        return _isActive;
     }
 
     function isRunning() {
@@ -124,7 +132,9 @@ class Model
         _lapCurrentData.Pace = _lapCurrentData.Speed == 0 ? 0 : 60 / _lapCurrentData.Speed;
         _lapCurrentData.HeartRate = safeGetNumber(info.currentHeartRate);
         _lapCurrentData.ElapsedSeconds = _lapSeconds;
-        _lapCurrentData.Distance = _speedConversion * (safeGetNumber(info.elapsedDistance) / 1000) - _startOfLapDistance;
+        // not sure how exactly this can happen but it does
+        var distance = _speedConversion * (safeGetNumber(info.elapsedDistance) / 1000) - _startOfLapDistance;
+        _lapCurrentData.Distance = distance >= 0 ? distance : 0;
         _lapCurrentData.GpsAccuracy = info.currentLocationAccuracy;
         _lapCurrentData.Activity = _activity;
         _lapCurrentData.IsRunning = isRunning();
