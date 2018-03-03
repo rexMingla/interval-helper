@@ -59,11 +59,6 @@ class Model
     }
 
     function start() {
-        onStart();
-        _isRunning = true;
-    }
-
-    private function onStart() {
         if (!hasStarted()) {
             _session = ActivityRecording.createSession({:sport=>_activity, :name=>"Intervals"});
             _lap = 1;
@@ -73,6 +68,7 @@ class Model
         // force it back on because Garmin turns it off
         Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:positionCallback));
         _session.start();
+        _isRunning = true;
     }
 
     function stop() {
@@ -81,12 +77,6 @@ class Model
         _isRunning = false;
     }
 
-    function resume() {
-        onStart();
-        _isRunning = true;
-    }
-
-    // creates a _lap. if it is an odd _lap the sensor data is turned off
     function startLap() {
         _lap++;
         _lapSeconds = 0;
@@ -96,9 +86,10 @@ class Model
         _lapTimer.stop();
         _session.addLap();
         if (isActiveLap()) {
-            onStart();
+            start();
         } else {
             _session.stop();
+            _session.start(); // weird. starting a lap doesn't automatically start the gps so we can leverage that
         }
         _lapTimer.start(method(:lapCallback), 1000, true);
     }

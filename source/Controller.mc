@@ -28,11 +28,6 @@ class Controller {
         _model.start();
     }
 
-    function resume() {
-        performAttention(Attention has :TONE_START ? Attention.TONE_START : null);
-        _model.resume();
-    }
-
     function stop() {
         performAttention(Attention has :TONE_STOP ? Attention.TONE_STOP : null);
         _model.stop();
@@ -63,7 +58,7 @@ class Controller {
         if (!hasStarted()) {
             onStartActivity();
         } else if (!isRunning()) {
-            resume();
+            start();
         } else {
             stop();
             WatchUi.pushView(new Rez.Menus.RunningMenu(), new delegate.RunningMenuDelegate(), WatchUi.SLIDE_UP);
