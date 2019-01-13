@@ -2,6 +2,7 @@ using Toybox.Activity;
 using Toybox.Sensor;
 using Toybox.System;
 using Toybox.Attention;
+using Toybox.Timer;
 using Toybox.FitContributor;
 using Toybox.ActivityRecording;
 
@@ -162,7 +163,7 @@ class Model
         _currentViewIndex = (_views.size() + _currentViewIndex + offset) % _views.size();
     }
 
-    private function lapCallback() {
+    function lapCallback() {
         _lapSeconds++;
     }
 
@@ -170,6 +171,6 @@ class Model
         return n == null ? 0 : n;
     }
 
-    private function positionCallback(info) {
+    function positionCallback(info) {
     }
 }
