@@ -90,7 +90,6 @@ class Model
             start();
         } else {
             _session.stop();
-            _session.start(); // weird. starting a lap doesn't automatically start the gps so we can leverage that
         }
         _lapTimer.start(method(:lapCallback), 1000, true);
     }
