@@ -85,8 +85,8 @@ class Model
         var info = Activity.getActivityInfo();
         _startOfLapDistance = safeGetNumber(info.elapsedDistance) / 1000;
         _lapTimer.stop();
-        _session.addLap();
         if (isActiveLap()) {
+            _session.addLap();
             start();
         } else {
             _session.stop();
