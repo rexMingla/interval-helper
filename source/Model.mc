@@ -66,6 +66,10 @@ class Model
         Application.getApp().setProperty("activity", _activity);
     }
 
+    function getActivity() {
+        return _activity;
+    }
+
     function setOffLapRecordingMode(isOn) {
         _isOffLapRecordingOn = isOn;
         Application.getApp().setProperty("isOffLapRecordingOn", _isOffLapRecordingOn);

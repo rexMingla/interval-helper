@@ -39,7 +39,7 @@ module view {
 
             var bottomLabelString = _data.IsActive ? labels.Distance : labels.Hr;
             var bottomLabelData = _data.IsActive ? data.Formatter.get2dpFloat(_data.Distance) : data.Formatter.getInt(_data.HeartRate);
-            drawTextAndData(dc, bottomLabelData, bottomLabelString, _posDetails.CentreColumn, _posDetails.BottomRow);
+            drawTextAndData(dc, bottomLabelString, bottomLabelData, _posDetails.CentreColumn, _posDetails.BottomRow);
         }
 
         private function drawTextAndData(dc, label, data, x, y) {

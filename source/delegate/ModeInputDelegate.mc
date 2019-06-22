@@ -17,10 +17,11 @@ module delegate {
 
         // Handle the menu input
         function onSelect(item) {
-            if (item.getId() == :record) {
+            var id = item.getId();
+            if (id == :record) {
                 _controller.setOffLapRecordingMode(true);
                 return true;
-            } else if (item.getId() == :norecord) {
+            } else if (id == :norecord) {
                 _controller.setOffLapRecordingMode(false);
                 return true;
             }
