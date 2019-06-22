@@ -4,7 +4,7 @@
     <!-- menus -->
     <string id="menu_start_start">Start</string>
     <string id="menu_start_select">Select Activity</string>
-    <string id="menu_start_mode">Select\nRecording Mode</string>
+    <string id="menu_start_mode">Select Recording Mode</string>
 
     <string id="middle">Default</string>
     <string id="menu_label_1">Resume</string>

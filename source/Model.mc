@@ -71,6 +71,10 @@ class Model
         Application.getApp().setProperty("isOffLapRecordingOn", _isOffLapRecordingOn);
     }
 
+    function isOffLapRecordingMode() {
+        return _isOffLapRecordingOn;
+    }
+
     function start() {
         if (!hasStarted()) {
             _session = ActivityRecording.createSession({:sport=>_activity, :name=>"Intervals"});

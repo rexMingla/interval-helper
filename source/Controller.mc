@@ -25,6 +25,11 @@ class Controller {
 
     function setOffLapRecordingMode(isOn) {
         _model.setOffLapRecordingMode(isOn);
+        WatchUi.popView(WatchUi.SLIDE_DOWN);
+    }
+
+    function isOffLapRecordingMode() {
+        return _model.isOffLapRecordingMode();
     }
 
     function start() {
@@ -78,7 +83,11 @@ class Controller {
     }
 
     function onSelectMode() {
-        WatchUi.pushView(new Rez.Menus.ModeMenu(), new delegate.ModeMenuDelegate(), WatchUi.SLIDE_UP);
+        var isOn = isOffLapRecordingMode();
+        var menu = new WatchUi.CheckboxMenu({:title=>"Record Mode", :focus=>isOn?1:2});
+        menu.addItem(new WatchUi.CheckboxMenuItem("Record off laps", null, :record, isOn, {}));
+        menu.addItem(new WatchUi.CheckboxMenuItem("Ignore off laps", null, :norecord, !isOn, {}));
+        WatchUi.pushView(menu, new delegate.ModeInputDelegate(), WatchUi.SLIDE_UP);
     }
 
     function isActiveLap() {
