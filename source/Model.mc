@@ -111,6 +111,7 @@ class Model
         } else {
            if (_isOffLapRecordingOn) {
                 _session.addLap();
+                Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:positionCallback));
            } else {
                 _session.stop();
            }
