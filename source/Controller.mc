@@ -91,7 +91,7 @@ class Controller {
 
     function onSelectMode() {
         var isOn = isOffLapRecordingMode();
-        var menu = new WatchUi.CheckboxMenu({:title=>"Record Mode", :focus=>isOn?1:2});
+        var menu = new WatchUi.CheckboxMenu({:title=>"Record Mode"});
         menu.addItem(new WatchUi.CheckboxMenuItem("Record off laps", null, :record, isOn, {}));
         menu.addItem(new WatchUi.CheckboxMenuItem("Ignore off laps", null, :norecord, !isOn, {}));
         WatchUi.pushView(menu, new delegate.ModeInputDelegate(), WatchUi.SLIDE_UP);
