@@ -4,6 +4,7 @@
     <!-- menus -->
     <string id="menu_start_start">Start</string>
     <string id="menu_start_select">Select Activity</string>
+    <string id="menu_start_mode">Select\nRecording Mode</string>
 
     <string id="middle">Default</string>
     <string id="menu_label_1">Resume</string>
@@ -15,6 +16,10 @@
     <string id="menu_activity_bike">Bike</string>
     <string id="menu_activity_swim">Swim</string>
     <string id="menu_activity_other">Other</string>
+    
+    <string id="menu_mode_title">Select Mode</string>
+    <string id="menu_mode_record">Record off laps</string>
+    <string id="menu_mode_norecord">Ignore off laps</string>
     
     <!-- labels -->
     <string id="view_time_of_day">Time</string>

@@ -16,6 +16,7 @@ class Model
     hidden var _isActive;
     hidden var _startOfLapDistance;
     hidden var _activity;
+    hidden var _isOffLapRecordingOn;
     hidden var _isRunning;
     hidden var _speedConversion;
 
@@ -47,16 +48,27 @@ class Model
         _currentViewIndex = 0;
         _activity = null;
         Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:positionCallback));
-        setActivity(ActivityRecording.SPORT_RUNNING);
+
+        var activity = Application.getApp().getProperty("activity");
+        setActivity(activity != null ? activity : ActivityRecording.SPORT_RUNNING);
         _lapCurrentData = new data.ViewDataset();
         _overallData = new data.ViewDataset();
         _speedConversion = System.getDeviceSettings().paceUnits == System.UNIT_METRIC ? 1 : KmsToMiles;
         _isRunning = false;
+
+        var isOn = Application.getApp().getProperty("isOffLapRecordingOn");
+        setOffLapRecordingMode(isOn != null && isOn);
     }
 
     function setActivity(activity) {
         _activity = activity;
         Sensor.setEnabledSensors(mAllSensorsByActivityType[_activity]);
+        Application.getApp().setProperty("activity", _activity);
+    }
+
+    function setOffLapRecordingMode(isOn) {
+        _isOffLapRecordingOn = isOn;
+        Application.getApp().setProperty("isOffLapRecordingOn", _isOffLapRecordingOn);
     }
 
     function start() {
@@ -89,7 +101,11 @@ class Model
             _session.addLap();
             start();
         } else {
-            _session.stop();
+           if (_isOffLapRecordingOn) {
+                _session.addLap();
+           } else {
+                _session.stop();
+           }
         }
         _lapTimer.start(method(:lapCallback), 1000, true);
     }

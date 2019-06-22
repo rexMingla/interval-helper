@@ -1,0 +1,4 @@
+<menu id="ModeMenu" title="@Strings.menu_mode_title">
+    <menu-item id="record" label="@Strings.menu_mode_record"></menu-item>
+    <menu-item id="norecord" label="@Strings.menu_mode_norecord"></menu-item>
+</menu>

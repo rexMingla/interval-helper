@@ -3,10 +3,10 @@ using Toybox.System as Sys;
 using Toybox.Application;
 using Toybox.Timer;
 
+// This delegate handles input for the Menu pushed when the user
+// selects the mode
 module delegate {
-    // This delegate handles input for the Menu pushed when the user
-    // selects the sport
-    class StartMenuDelegate extends Ui.MenuInputDelegate {
+    class ModeMenuDelegate extends Ui.MenuInputDelegate {
 
         private var _controller;
 
@@ -17,14 +17,11 @@ module delegate {
 
         // Handle the menu input
         function onMenuItem(item) {
-            if (item == :start) {
-                _controller.start();
+            if (item == :record) {
+                _controller.setOffLapRecordingMode(true);
                 return true;
-            } else if (item == :select) {
-                _controller.onSelectActivity();
-                return true;
-            } else if (item == :mode) {
-                _controller.onSelectMode();
+            } else if (item == :norecord) {
+                _controller.setOffLapRecordingMode(false);
                 return true;
             }
             return false;

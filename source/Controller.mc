@@ -23,6 +23,10 @@ class Controller {
         _model.setActivity(activity);
     }
 
+    function setOffLapRecordingMode(isOn) {
+        _model.setOffLapRecordingMode(isOn);
+    }
+
     function start() {
         performAttention(Attention has :TONE_START ? Attention.TONE_START : null);
         _model.start();
@@ -71,6 +75,10 @@ class Controller {
 
     function onSelectActivity() {
         WatchUi.pushView(new Rez.Menus.ActivityMenu(), new delegate.ActivityMenuDelegate(), WatchUi.SLIDE_UP);
+    }
+
+    function onSelectMode() {
+        WatchUi.pushView(new Rez.Menus.ModeMenu(), new delegate.ModeMenuDelegate(), WatchUi.SLIDE_UP);
     }
 
     function isActiveLap() {

@@ -37,8 +37,9 @@ module view {
             var timeString = data.Formatter.getTimeFromSecs(_data.ElapsedSeconds);
             drawTextAndData(dc, labels.Time, timeString, _posDetails.CentreColumn, _posDetails.CentreRow);
 
-            var distString = data.Formatter.get2dpFloat(_data.Distance);
-            drawTextAndData(dc, labels.Distance, distString, _posDetails.CentreColumn, _posDetails.BottomRow);
+            var bottomLabelString = _data.IsActive ? labels.Distance : labels.Hr;
+            var bottomLabelData = _data.IsActive ? data.Formatter.get2dpFloat(_data.Distance) : data.Formatter.getInt(_data.HeartRate);
+            drawTextAndData(dc, bottomLabelData, bottomLabelString, _posDetails.CentreColumn, _posDetails.BottomRow);
         }
 
         private function drawTextAndData(dc, label, data, x, y) {
