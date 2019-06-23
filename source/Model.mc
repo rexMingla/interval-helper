@@ -16,7 +16,7 @@ class Model
     hidden var _isActive;
     hidden var _startOfLapDistance;
     hidden var _activity;
-    hidden var _isOffLapRecordingOn;
+    hidden var _offLapRecordingMode;
     hidden var _isRunning;
     hidden var _speedConversion;
 
@@ -31,6 +31,12 @@ class Model
     enum {
        Lap,
        Total
+    }
+
+    enum {
+        NoRecord,
+        RecordNoGps,
+        RecordWithGps
     }
 
     hidden static var mAllSensorsByActivityType = {
@@ -56,8 +62,9 @@ class Model
         _speedConversion = System.getDeviceSettings().paceUnits == System.UNIT_METRIC ? 1 : KmsToMiles;
         _isRunning = false;
 
-        var isOn = Application.getApp().getProperty("isOffLapRecordingOn");
-        setOffLapRecordingMode(isOn != null && isOn);
+        var offLapMode = Application.getApp().getProperty("offLapRecordingMode");
+        offLapMode = offLapMode != null ? offLapMode : NoRecord;
+        setOffLapRecordingMode(offLapMode);
     }
 
     function setActivity(activity) {
@@ -70,13 +77,13 @@ class Model
         return _activity;
     }
 
-    function setOffLapRecordingMode(isOn) {
-        _isOffLapRecordingOn = isOn;
-        Application.getApp().setProperty("isOffLapRecordingOn", _isOffLapRecordingOn);
+    function setOffLapRecordingMode(offLapMode) {
+        _offLapRecordingMode = offLapMode;
+        Application.getApp().setProperty("offLapRecordingMode", _offLapRecordingMode);
     }
 
-    function isOffLapRecordingMode() {
-        return _isOffLapRecordingOn;
+    function offLapRecordingMode() {
+        return _offLapRecordingMode;
     }
 
     function start() {
@@ -109,11 +116,13 @@ class Model
             _session.addLap();
             start();
         } else {
-           if (_isOffLapRecordingOn) {
-                _session.addLap();
-                Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:positionCallback));
-           } else {
+           if (_offLapRecordingMode == NoRecord) {
                 _session.stop();
+           } else {
+                _session.addLap();
+                if (_offLapRecordingMode == RecordNoGps) {
+                    Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:positionCallback));
+                }
            }
         }
         _lapTimer.start(method(:lapCallback), 1000, true);

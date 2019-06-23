@@ -18,20 +18,8 @@ module delegate {
         // Handle the menu input
         function onSelect(item) {
             var id = item.getId();
-            if (id == :run) {
-                _controller.setActivity(ActivityRecording.SPORT_RUNNING);
-                return true;
-            } else if (id == :bike) {
-                _controller.setActivity(ActivityRecording.SPORT_CYCLING);
-                return true;
-            } else if (id == :swim) {
-                _controller.setActivity(ActivityRecording.SPORT_SWIMMING);
-                return true;
-            } else if (id == :other) {
-                _controller.setActivity(ActivityRecording.SPORT_GENERIC);
-                return true;
-            }
-            return false;
+            _controller.setActivity(id);
+            return true;
         }
     }
 }

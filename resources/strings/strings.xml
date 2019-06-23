@@ -16,10 +16,18 @@
     <string id="menu_activity_bike">Bike</string>
     <string id="menu_activity_swim">Swim</string>
     <string id="menu_activity_other">Other</string>
+    <string id="menu_activity_run_selected">*Run</string>
+    <string id="menu_activity_bike_selected">*Bike</string>
+    <string id="menu_activity_swim_selected">*Swim</string>
+    <string id="menu_activity_other_selected">*Other</string>
     
-    <string id="menu_mode_title">Select Mode</string>
-    <string id="menu_mode_record">Record off laps</string>
+    <string id="menu_mode_title">Record Mode</string>
     <string id="menu_mode_norecord">Ignore off laps</string>
+    <string id="menu_mode_recordnogps">Record, no gps</string>
+    <string id="menu_mode_recordwithgps">Record, with gps</string>
+    <string id="menu_mode_norecord_selected">*Ignore off laps</string>
+    <string id="menu_mode_recordnogps_selected">*Record, no gps</string>
+    <string id="menu_mode_recordwithgps_selected">*Record, with gps</string>
     
     <!-- labels -->
     <string id="view_time_of_day">Time</string>

@@ -4,22 +4,22 @@ using Toybox.Application;
 using Toybox.Timer;
 
 // This delegate handles input for the Menu pushed when the user
-// selects the mode
+// selects the sport
+// needed because the new one is only supported in >=3.0 sdk
 module delegate {
-    class ModeInputDelegate extends Ui.Menu2InputDelegate {
+    class OldActivityInputDelegate extends Ui.MenuInputDelegate {
 
         private var _controller;
 
         function initialize() {
-            Menu2InputDelegate.initialize();
+            MenuInputDelegate.initialize();
             _controller = Application.getApp().getController();
         }
 
         // Handle the menu input
-        function onSelect(item) {
-            var id = item.getId();
-            _controller.setOffLapRecordingMode(id);
-            return true;
+        function onMenuItem(id) {
+            _controller.setActivity(id);
+            return false;
         }
     }
 }
