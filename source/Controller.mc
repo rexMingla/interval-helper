@@ -18,7 +18,7 @@ class Controller {
         var settings = System.getDeviceSettings();
         _isVibrateOn = settings.vibrateOn;
         _isTonesOn = settings.tonesOn;
-        _hasCheckboxFeature = hasCheckboxFeature();
+        _hasCheckboxFeature = WatchUi has :Menu2;
     }
 
     function setActivity(activity) {
@@ -88,11 +88,11 @@ class Controller {
     function onSelectActivity() {
         var activity = _model.getActivity();
         if (_hasCheckboxFeature) {
-            var menu = new WatchUi.CheckboxMenu({:title=>WatchUi.loadResource(Rez.Strings.menu_activity_title)});
-            menu.addItem(new WatchUi.CheckboxMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_run), null, ActivityRecording.SPORT_RUNNING, activity == ActivityRecording.SPORT_RUNNING, {}));
-            menu.addItem(new WatchUi.CheckboxMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_bike), null, ActivityRecording.SPORT_CYCLING, activity == ActivityRecording.SPORT_CYCLING, {}));
-            menu.addItem(new WatchUi.CheckboxMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_swim), null, ActivityRecording.SPORT_SWIMMING, activity == ActivityRecording.SPORT_SWIMMING, {}));
-            menu.addItem(new WatchUi.CheckboxMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_other), null, ActivityRecording.SPORT_GENERIC, activity == ActivityRecording.SPORT_GENERIC, {}));
+            var menu = new WatchUi.Menu2({:title=>WatchUi.loadResource(Rez.Strings.menu_activity_title)});
+            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_run), null, ActivityRecording.SPORT_RUNNING, activity == ActivityRecording.SPORT_RUNNING, {}));
+            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_bike), null, ActivityRecording.SPORT_CYCLING, activity == ActivityRecording.SPORT_CYCLING, {}));
+            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_swim), null, ActivityRecording.SPORT_SWIMMING, activity == ActivityRecording.SPORT_SWIMMING, {}));
+            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_other), null, ActivityRecording.SPORT_GENERIC, activity == ActivityRecording.SPORT_GENERIC, {}));
             WatchUi.pushView(menu, new delegate.ActivityInputDelegate(), WatchUi.SLIDE_UP);
         } else {
             var menu = new WatchUi.Menu();
@@ -116,10 +116,10 @@ class Controller {
     function onSelectMode() {
         var mode = offLapRecordingMode();
         if (_hasCheckboxFeature) {
-            var menu = new WatchUi.CheckboxMenu({:title=>WatchUi.loadResource(Rez.Strings.menu_mode_title)});
-            menu.addItem(new WatchUi.CheckboxMenuItem(WatchUi.loadResource(Rez.Strings.menu_mode_norecord), null, Model.NoRecord, mode == Model.NoRecord, {}));
-            menu.addItem(new WatchUi.CheckboxMenuItem(WatchUi.loadResource(Rez.Strings.menu_mode_recordnogps), null, Model.RecordNoGps, mode == Model.RecordNoGps, {}));
-            menu.addItem(new WatchUi.CheckboxMenuItem(WatchUi.loadResource(Rez.Strings.menu_mode_recordwithgps), null, Model.RecordWithGps, mode == Model.RecordWithGps, {}));
+            var menu = new WatchUi.Menu2({:title=>WatchUi.loadResource(Rez.Strings.menu_mode_title)});
+            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_mode_norecord), null, Model.NoRecord, mode == Model.NoRecord, {}));
+            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_mode_recordnogps), null, Model.RecordNoGps, mode == Model.RecordNoGps, {}));
+            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_mode_recordwithgps), null, Model.RecordWithGps, mode == Model.RecordWithGps, {}));
             WatchUi.pushView(menu, new delegate.ModeInputDelegate(), WatchUi.SLIDE_UP);
         } else {
             var menu = new WatchUi.Menu();
@@ -135,12 +135,6 @@ class Controller {
                 : WatchUi.loadResource(Rez.Strings.menu_mode_recordwithgps), Model.RecordWithGps);
             WatchUi.pushView(menu, new delegate.OldModeInputDelegate(), WatchUi.SLIDE_UP);
         }
-    }
-
-    private function hasCheckboxFeature() {
-        var mySettings = System.getDeviceSettings();
-        var version = mySettings.monkeyVersion;
-        return version[0] >= 3;
     }
 
     function isActiveLap() {
