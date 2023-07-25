@@ -1,5 +1,6 @@
 <menu id="RunningMenu" >
-    <menu-item id="resume" label="@Strings.menu_label_1"></menu-item>
-    <menu-item id="save" label="@Strings.menu_label_2"></menu-item>
-    <menu-item id="discard" label="@Strings.menu_label_3"></menu-item>
+    <menu-item id="resume" label="@Strings.menu_running_resume"></menu-item>
+    <menu-item id="save" label="@Strings.menu_running_save"></menu-item>
+    <menu-item id="auto_lap_off" label="@Strings.menu_running_auto_lap_off"></menu-item>
+    <menu-item id="discard" label="@Strings.menu_running_discard"></menu-item>
 </menu>

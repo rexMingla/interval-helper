@@ -7,13 +7,20 @@ using Toybox.Attention;
 class Controller {
     hidden var _model;
     hidden var _timer;
+    hidden var _heartbeatTimer as Timer.Timer;
     hidden var _isShowingLapSummaryView;
     hidden var _isTonesOn;
     hidden var _isVibrateOn;
     hidden var _hasCheckboxFeature;
+    
+    hidden var _isAutoLapDisabled = false;
+    hidden var _currentLapEndSeconds = null;
+    hidden var _currentLapEndMetres = null;
 
     function initialize() {
         _timer = new Timer.Timer();
+        _heartbeatTimer = new Timer.Timer();
+
         _model = Application.getApp().getModel();
         var settings = System.getDeviceSettings();
         _isVibrateOn = settings.vibrateOn;
@@ -35,18 +42,37 @@ class Controller {
         }
     }
 
+    function setLapEnd(lapEnd as data.LapEnd) {
+        if (lapEnd.LapType == Model.LapOn) {
+            _model.setOnLapEnd(lapEnd);
+        } else {
+            _model.setOffLapEnd(lapEnd);
+        }
+    }
+
     function offLapRecordingMode() {
         return _model.offLapRecordingMode();
+    }
+
+    function onLapEnd() as data.LapEnd {
+        return _model.onLapEnd();
+    }
+
+    function offLapEnd() as data.LapEnd {
+        return _model.offLapEnd();
     }
 
     function start() {
         performAttention(Attention has :TONE_START ? Attention.TONE_START : null);
         _model.start();
+        setupAutoLap();
     }
 
     function stop() {
         performAttention(Attention has :TONE_STOP ? Attention.TONE_STOP : null);
         _model.stop();
+        setupAutoLap();
+        _heartbeatTimer.stop();
     }
 
     function save() {
@@ -87,54 +113,36 @@ class Controller {
 
     function onSelectActivity() {
         var activity = _model.getActivity();
-        if (_hasCheckboxFeature) {
-            var menu = new WatchUi.Menu2({:title=>WatchUi.loadResource(Rez.Strings.menu_activity_title)});
-            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_run), null, ActivityRecording.SPORT_RUNNING, activity == ActivityRecording.SPORT_RUNNING, {}));
-            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_bike), null, ActivityRecording.SPORT_CYCLING, activity == ActivityRecording.SPORT_CYCLING, {}));
-            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_swim), null, ActivityRecording.SPORT_SWIMMING, activity == ActivityRecording.SPORT_SWIMMING, {}));
-            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_other), null, ActivityRecording.SPORT_GENERIC, activity == ActivityRecording.SPORT_GENERIC, {}));
-            WatchUi.pushView(menu, new delegate.ActivityInputDelegate(), WatchUi.SLIDE_UP);
-        } else {
-            var menu = new WatchUi.Menu();
-            menu.setTitle(WatchUi.loadResource(Rez.Strings.menu_activity_title));
-            menu.addItem(activity == ActivityRecording.SPORT_RUNNING
-                ? WatchUi.loadResource(Rez.Strings.menu_activity_run_selected)
-                : WatchUi.loadResource(Rez.Strings.menu_activity_run), ActivityRecording.SPORT_RUNNING);
-            menu.addItem(activity == ActivityRecording.SPORT_CYCLING
-                ? WatchUi.loadResource(Rez.Strings.menu_activity_bike_selected)
-                : WatchUi.loadResource(Rez.Strings.menu_activity_bike), ActivityRecording.SPORT_CYCLING);
-            menu.addItem(activity == ActivityRecording.SPORT_SWIMMING
-                ? WatchUi.loadResource(Rez.Strings.menu_activity_swim_selected)
-                : WatchUi.loadResource(Rez.Strings.menu_activity_swim), ActivityRecording.SPORT_SWIMMING);
-            menu.addItem(activity == ActivityRecording.SPORT_GENERIC
-                ? WatchUi.loadResource(Rez.Strings.menu_activity_other_selected)
-                : WatchUi.loadResource(Rez.Strings.menu_activity_other), ActivityRecording.SPORT_GENERIC);
-            WatchUi.pushView(menu, new delegate.OldActivityInputDelegate(), WatchUi.SLIDE_UP);
-        }
+
+        var menu = new WatchUi.Menu2({:title=>WatchUi.loadResource(Rez.Strings.menu_activity_title)});
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_run), null, ActivityRecording.SPORT_RUNNING, activity == ActivityRecording.SPORT_RUNNING, {}));
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_bike), null, ActivityRecording.SPORT_CYCLING, activity == ActivityRecording.SPORT_CYCLING, {}));
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_swim), null, ActivityRecording.SPORT_SWIMMING, activity == ActivityRecording.SPORT_SWIMMING, {}));
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_other), null, ActivityRecording.SPORT_GENERIC, activity == ActivityRecording.SPORT_GENERIC, {}));
+        WatchUi.pushView(menu, new delegate.ActivityInputDelegate(), WatchUi.SLIDE_UP);
     }
 
     function onSelectMode() {
         var mode = offLapRecordingMode();
-        if (_hasCheckboxFeature) {
-            var menu = new WatchUi.Menu2({:title=>WatchUi.loadResource(Rez.Strings.menu_mode_title)});
-            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_mode_norecord), null, Model.NoRecord, mode == Model.NoRecord, {}));
-            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_mode_recordnogps), null, Model.RecordNoGps, mode == Model.RecordNoGps, {}));
-            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_mode_recordwithgps), null, Model.RecordWithGps, mode == Model.RecordWithGps, {}));
-            WatchUi.pushView(menu, new delegate.ModeInputDelegate(), WatchUi.SLIDE_UP);
-        } else {
-            var menu = new WatchUi.Menu();
-            menu.setTitle(WatchUi.loadResource(Rez.Strings.menu_mode_title));
-            menu.addItem(mode == Model.NoRecord
-                ? WatchUi.loadResource(Rez.Strings.menu_mode_norecord_selected)
-                : WatchUi.loadResource(Rez.Strings.menu_mode_norecord), Model.NoRecord);
-            menu.addItem(mode == Model.RecordNoGps
-                ? WatchUi.loadResource(Rez.Strings.menu_mode_recordnogps_selected)
-                : WatchUi.loadResource(Rez.Strings.menu_mode_recordnogps), Model.RecordNoGps);
-            menu.addItem(mode == Model.RecordWithGps
-                ? WatchUi.loadResource(Rez.Strings.menu_mode_recordwithgps_selected)
-                : WatchUi.loadResource(Rez.Strings.menu_mode_recordwithgps), Model.RecordWithGps);
-            WatchUi.pushView(menu, new delegate.OldModeInputDelegate(), WatchUi.SLIDE_UP);
-        }
+
+        var menu = new WatchUi.Menu2({:title=>WatchUi.loadResource(Rez.Strings.menu_mode_title)});
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_mode_norecord), null, Model.NoRecord, mode == Model.NoRecord, {}));
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_mode_recordnogps), null, Model.RecordNoGps, mode == Model.RecordNoGps, {}));
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_mode_recordwithgps), null, Model.RecordWithGps, mode == Model.RecordWithGps, {}));
+        WatchUi.pushView(menu, new delegate.ModeInputDelegate(), WatchUi.SLIDE_UP);
+    }
+
+    function onSelectLapEnd(lapType) {
+        var isLapOn = lapType == Model.LapOn;
+        var lapEnd = isLapOn ? onLapEnd() : offLapEnd();
+
+        var menu = new WatchUi.Menu2({:title=>WatchUi.loadResource(isLapOn ? Rez.Strings.menu_lap_on_trigger_title : Rez.Strings.menu_lap_off_trigger_title), });
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_lap_trigger_user), null, Model.LapButtonPress, lapEnd.Trigger == Model.LapButtonPress, {}));
+        var timePreview = lapEnd.Trigger == Model.TimeElapsed ? lapEnd.Units : "Set min:sec";
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_lap_trigger_time), timePreview, Model.TimeElapsed, lapEnd.Trigger == Model.TimeElapsed, {}));
+        var distPreview = lapEnd.Trigger == Model.DistanceElapsed ? lapEnd.Units : "Set mi or km";
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_lap_trigger_distance), distPreview, Model.DistanceElapsed, lapEnd.Trigger == Model.DistanceElapsed, {}));
+        WatchUi.pushView(menu, new delegate.LapMenuInputDelegate(lapEnd), WatchUi.SLIDE_UP);
     }
 
     function isActiveLap() {
@@ -162,6 +170,10 @@ class Controller {
         }
         _isShowingLapSummaryView = true;
         _timer.start(method(:hideLapSummaryView), 5000, false);
+
+        _currentLapEndSeconds = null;
+        _currentLapEndMetres = null;
+        setupAutoLap();
     }
 
     function hideLapSummaryView() {
@@ -169,6 +181,41 @@ class Controller {
             WatchUi.popView(WatchUi.SLIDE_DOWN);
             _isShowingLapSummaryView = false;
         }
+    }
+
+    private function setupAutoLap() {
+        var lapEnd = _model.isActiveLap() ? onLapEnd() : offLapEnd();
+                
+        if (lapEnd.Trigger == Model.TimeElapsed) {
+            _currentLapEndSeconds = data.TimeDto.fromString(lapEnd.Units).toSeconds();
+        }
+        if (lapEnd.Trigger == Model.DistanceElapsed) {
+            _currentLapEndMetres = data.DistanceDto.fromString(lapEnd.Units).toMetres();
+        }
+
+        _heartbeatTimer.start(method(:onTick), 1000, true);
+    }
+
+    function onTick() {
+        var sample = _model.tickSeconds();
+        
+        if (_isAutoLapDisabled) {
+            return;
+        }
+
+        if (_currentLapEndSeconds != null && sample.Seconds >= _currentLapEndSeconds) {
+            onLap();
+            return;
+        }
+
+        if (_currentLapEndMetres != null && sample.Metres >= _currentLapEndMetres) {
+            onLap();
+            return;
+        }
+    }
+
+    function turnOffAutoLap() {
+        _isAutoLapDisabled = true;
     }
 
     function onExit() {
