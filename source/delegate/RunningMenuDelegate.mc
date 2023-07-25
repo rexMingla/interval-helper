@@ -21,6 +21,9 @@ module delegate {
             } else if (item == :save) {
                 _controller.save();
                 return true;
+            } else if (item == :auto_lap_off) {
+                _controller.turnOffAutoLap();
+                return true;
             } else {
                 _controller.discard();
                 return true;

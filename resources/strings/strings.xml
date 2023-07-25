@@ -3,15 +3,16 @@
 
     <!-- menus -->
     <string id="menu_start_start">Start</string>
-    <string id="menu_start_select">Select Activity</string>
-    <string id="menu_start_mode">Select Recording Mode</string>
+    <string id="menu_start_select">Set Activity</string>
+    <string id="menu_start_mode">Set Recording Mode</string>
 
     <string id="middle">Default</string>
-    <string id="menu_label_1">Resume</string>
-    <string id="menu_label_2">Save</string>
-    <string id="menu_label_3">Discard</string>  
+    <string id="menu_running_resume">Resume</string>
+    <string id="menu_running_save">Save</string>
+    <string id="menu_running_auto_lap_off">Turn Off Auto Lap</string>
+    <string id="menu_running_discard">Discard</string>  
 
-    <string id="menu_activity_title">Select Activity</string>
+    <string id="menu_activity_title">Set Activity</string>
     <string id="menu_activity_run">Run</string>
     <string id="menu_activity_bike">Bike</string>
     <string id="menu_activity_swim">Swim</string>
@@ -29,6 +30,20 @@
     <string id="menu_mode_recordnogps_selected">*Record, no gps</string>
     <string id="menu_mode_recordwithgps_selected">*Record, with gps</string>
     
+    <string id="menu_lap_off_trigger_title">Set Lap Off Trigger</string>
+    <string id="menu_lap_on_trigger_title">Set Lap On Trigger</string>
+    <string id="menu_lap_trigger_user">Lap button press</string>
+    <string id="menu_lap_trigger_time">Time</string>
+    <string id="menu_lap_trigger_distance">Distance</string>
+
+    <string id="menu_lap_trigger_distance_metres">Metres</string>
+    <string id="menu_lap_trigger_distance_kilometres">Kms</string>
+    <string id="menu_lap_trigger_distance_miles">Miles</string>
+    
+    <string id="menu_lap_trigger_user_selected">*Lap button press</string>
+    <string id="menu_lap_trigger_time_selected">*Time</string>
+    <string id="menu_lap_trigger_distance_selected">*Distance</string>
+
     <!-- labels -->
     <string id="view_time_of_day">Time</string>
     <!-- lap labels -->
@@ -52,6 +67,6 @@
     <!-- lap labels -->
     <string id="lap_on">On</string>
     <string id="lap_off">Off</string>
-    <string id="welcome_format">GPS Signal: $1$\nPress Start To Begin</string>
-    <string id="resume_format">GPS Signal: $1$\nPress Start To Resume</string>
+    <string id="welcome_format">GPS Signal: $1$\nPress Start To Begin\n$2$</string>
+    <string id="resume_format">GPS Signal: $1$\nPress Start To Resume\n$2$</string>
 </strings>

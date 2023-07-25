@@ -8,15 +8,16 @@ using Toybox.ActivityRecording;
 
 class Model
 {
-    hidden var _timer;
     hidden var _session;
-    hidden var _lapTimer;
     hidden var _lap;
     hidden var _lapSeconds;
+    hidden var _lapMetres;
     hidden var _isActive;
-    hidden var _startOfLapDistance;
+    hidden var _startOfLapDistanceKilometres;
     hidden var _activity;
     hidden var _offLapRecordingMode;
+    hidden var _offLapEnd;
+    hidden var _onLapEnd;
     hidden var _isRunning;
     hidden var _speedConversion;
 
@@ -39,6 +40,17 @@ class Model
         RecordWithGps
     }
 
+    enum {
+        LapButtonPress,        
+        TimeElapsed,
+        DistanceElapsed
+    }
+    
+    enum {
+        LapOn,
+        LapOff
+    }
+
     hidden static var mAllSensorsByActivityType = {
         ActivityRecording.SPORT_RUNNING => [Sensor.SENSOR_HEARTRATE, Sensor.SENSOR_FOOTPOD, Sensor.SENSOR_TEMPERATURE],
         ActivityRecording.SPORT_CYCLING => [Sensor.SENSOR_BIKESPEED, Sensor.SENSOR_BIKECADENCE, Sensor.SENSOR_BIKEPOWER, Sensor.SENSOR_HEARTRATE, Sensor.SENSOR_FOOTPOD, Sensor.SENSOR_TEMPERATURE],
@@ -50,7 +62,8 @@ class Model
         _lap = 0;
         _isActive = true;
         _lapSeconds = 0;
-        _startOfLapDistance = 0;
+        _lapMetres = 0;
+        _startOfLapDistanceKilometres = 0;
         _currentViewIndex = 0;
         _activity = null;
         Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:positionCallback));
@@ -62,9 +75,23 @@ class Model
         _speedConversion = System.getDeviceSettings().paceUnits == System.UNIT_METRIC ? 1 : KmsToMiles;
         _isRunning = false;
 
-        var offLapMode = Application.getApp().getProperty("offLapRecordingMode");
-        offLapMode = offLapMode != null ? offLapMode : NoRecord;
-        setOffLapRecordingMode(offLapMode);
+        {
+            var mode = Application.getApp().getProperty("offLapRecordingMode");
+            mode = mode != null ? mode : NoRecord;
+            setOffLapRecordingMode(mode);
+        }
+        
+        {
+            var trigger = Application.getApp().getProperty("offLapEndTrigger");
+            var units = Application.getApp().getProperty("offLapEndUnits");
+            setOffLapEnd(new data.LapEnd(Model.LapOff, trigger, units));
+        }
+
+        {
+            var trigger = Application.getApp().getProperty("onLapEndTrigger");
+            var units = Application.getApp().getProperty("onLapEndUnits");
+            setOnLapEnd(new data.LapEnd(Model.LapOn, trigger, units));
+        }
     }
 
     function setActivity(activity) {
@@ -77,21 +104,39 @@ class Model
         return _activity;
     }
 
-    function setOffLapRecordingMode(offLapMode) {
-        _offLapRecordingMode = offLapMode;
+    function setOffLapRecordingMode(mode) {
+        _offLapRecordingMode = mode;
         Application.getApp().setProperty("offLapRecordingMode", _offLapRecordingMode);
+    }
+
+    function setOffLapEnd(lapEnd as data.LapEnd) {
+        _offLapEnd = lapEnd;
+        Application.getApp().setProperty("offLapEndTrigger", _offLapEnd.Trigger);
+        Application.getApp().setProperty("offLapEndUnits", _offLapEnd.Units);
+    }
+
+    function setOnLapEnd(lapEnd as data.LapEnd) {
+        _onLapEnd = lapEnd;
+        Application.getApp().setProperty("onLapEndTrigger", _onLapEnd.Trigger);
+        Application.getApp().setProperty("onLapEndUnits", _onLapEnd.Units);
     }
 
     function offLapRecordingMode() {
         return _offLapRecordingMode;
     }
 
+    function offLapEnd()  as data.LapEnd {
+        return _offLapEnd;
+    }
+
+    function onLapEnd()  as data.LapEnd {
+        return _onLapEnd;
+    }
+
     function start() {
         if (!hasStarted()) {
             _session = ActivityRecording.createSession({:sport=>_activity, :name=>"Intervals"});
             _lap = 1;
-            _lapTimer = new Timer.Timer();
-            _lapTimer.start(method(:lapCallback), 1000, true);
         }
         // force it back on because Garmin turns it off
         Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:positionCallback));
@@ -99,8 +144,11 @@ class Model
         _isRunning = true;
     }
 
+    function TickSeconds() {
+
+    }
+
     function stop() {
-        _lapTimer.stop();
         _session.stop();
         _isRunning = false;
     }
@@ -108,24 +156,25 @@ class Model
     function startLap() {
         _lap++;
         _lapSeconds = 0;
+        _lapMetres = 0;
         _isActive = !_isActive;
         var info = Activity.getActivityInfo();
-        _startOfLapDistance = safeGetNumber(info.elapsedDistance) / 1000;
-        _lapTimer.stop();
+        _startOfLapDistanceKilometres = safeGetNumber(info.elapsedDistance) / 1000;
         if (isActiveLap()) {
             _session.addLap();
             start();
-        } else {
-           if (_offLapRecordingMode == NoRecord) {
-                _session.stop();
-           } else {
-                _session.addLap();
-                if (_offLapRecordingMode == RecordNoGps) {
-                    Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:positionCallback));
-                }
-           }
+            return;
         }
-        _lapTimer.start(method(:lapCallback), 1000, true);
+
+        if (_offLapRecordingMode == NoRecord) {
+            _session.stop();
+            return;
+        }
+
+        _session.addLap();
+        if (_offLapRecordingMode == RecordNoGps) {
+            Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:positionCallback));
+        }
     }
 
     function hasStarted() {
@@ -158,7 +207,10 @@ class Model
         _lapCurrentData.HeartRate = safeGetNumber(info.currentHeartRate);
         _lapCurrentData.ElapsedSeconds = _lapSeconds;
         // not sure how exactly this can happen but it does
-        var distance = _speedConversion * (safeGetNumber(info.elapsedDistance) / 1000) - _startOfLapDistance;
+        var metres = safeGetNumber(info.elapsedDistance);
+        _lapMetres = metres - _startOfLapDistanceKilometres * 1000;
+
+        var distance = _speedConversion * (metres / 1000 - _startOfLapDistanceKilometres);
         _lapCurrentData.Distance = distance >= 0 ? distance : 0;
         _lapCurrentData.GpsAccuracy = info.currentLocationAccuracy;
         _lapCurrentData.Activity = _activity;
@@ -196,8 +248,9 @@ class Model
         _currentViewIndex = (_views.size() + _currentViewIndex + offset) % _views.size();
     }
 
-    function lapCallback() {
-        _lapSeconds++;
+    function tickSeconds() as data.LapSample {
+        _lapSeconds += 1;
+        return new data.LapSample(_lapSeconds, _lapMetres);
     }
 
     private function safeGetNumber(n) {
@@ -205,5 +258,9 @@ class Model
     }
 
     function positionCallback(info) {
+    }
+
+    function getAutoLapSummary() {
+        return Lang.format("$1$, $2$", [_onLapEnd.toDisplay(), _offLapEnd.toDisplay()]);
     }
 }

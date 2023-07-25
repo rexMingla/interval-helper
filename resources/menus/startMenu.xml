@@ -1,5 +1,7 @@
 <menu id="StartMenu">
     <menu-item id="start" label="@Strings.menu_start_start"></menu-item>
     <menu-item id="select" label="@Strings.menu_start_select"></menu-item>
+    <menu-item id="lapOn" label="@Strings.menu_lap_on_trigger_title"></menu-item>
+    <menu-item id="lapOff" label="@Strings.menu_lap_off_trigger_title"></menu-item>
     <menu-item id="mode" label="@Strings.menu_start_mode"></menu-item>
 </menu>

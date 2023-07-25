@@ -8,7 +8,7 @@ module delegate {
     // selects the sport
     class StartMenuDelegate extends Ui.MenuInputDelegate {
 
-        private var _controller;
+        private var _controller as Controller;
 
         function initialize() {
             MenuInputDelegate.initialize();
@@ -25,6 +25,12 @@ module delegate {
                 return true;
             } else if (item == :mode) {
                 _controller.onSelectMode();
+                return true;
+            } else if (item == :lapOff) {
+                _controller.onSelectLapEnd(Model.LapOff);
+                return true;
+            } else if (item == :lapOn) {
+                _controller.onSelectLapEnd(Model.LapOn);
                 return true;
             }
             return false;

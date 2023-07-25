@@ -1,4 +1,5 @@
-using Toybox.Lang;
+using Toybox.System;
+import Toybox.Lang;
 
 module data {
     class Formatter {
