@@ -16,10 +16,9 @@ module delegate {
         }
 
         // Handle the menu input
-        function onSelect(item) {
+        function onSelect(item as Ui.MenuItem) as Void {
             var id = item.getId();
             _controller.setOffLapRecordingMode(id);
-            return true;
         }
     }
 }

@@ -2,6 +2,7 @@ using Toybox.WatchUi as Ui;
 using Toybox.System as Sys;
 using Toybox.Application;
 using Toybox.Timer;
+import Toybox.Lang;
 
 module delegate {
     // This delegate handles input for the Menu pushed when the user
@@ -16,18 +17,14 @@ module delegate {
         }
 
         // Handle the menu input
-        function onMenuItem(item) {
+        function onMenuItem(item as Symbol) as Void {
             if (item == :start) {
                 _controller.start();
-                return true;
             } else if (item == :select) {
                 _controller.onSelectActivity();
-                return true;
             } else if (item == :mode) {
                 _controller.onSelectMode();
-                return true;
             }
-            return false;
         }
     }
 }

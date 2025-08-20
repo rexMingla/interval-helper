@@ -1,15 +1,19 @@
 using Toybox.WatchUi as Ui;
 using Toybox.Application;
+using Toybox.Activity;
 using Toybox.Timer;
 using Toybox.Lang;
 using Toybox.Graphics;
+import Toybox;
+import Toybox.Lang;
+import Toybox.Graphics;
 
 module view {
     class MainView extends Ui.View {
-        hidden var _model;
-        hidden var _timer;
-        hidden var _posDetails;
-        hidden var _timeDisplayModulus;
+        hidden var _model as Model;
+        hidden var _timer as Timer.Timer;
+        hidden var _posDetails as data.PositionDetails;
+        hidden var _timeDisplayModulus as Number;
 
         function initialize() {
             View.initialize();
@@ -18,16 +22,16 @@ module view {
             _timeDisplayModulus = System.getDeviceSettings().is24Hour ? 24 : 12;
         }
 
-        function onLayout(dc) {
+        function onLayout(dc as Graphics.Dc) as Void {
             _posDetails = data.PositionDetails.createFromDataContext(dc);
         }
 
-        function onShow() {
+        function onShow() as Void {
             _timer.start(method(:onTimer), 1000, true);
         }
 
         // Update the view
-        function onUpdate(dc) {
+        function onUpdate(dc as Graphics.Dc) as Void {
             View.onUpdate(dc);
 
             var view = _model.getCurrentView();
@@ -65,42 +69,42 @@ module view {
             drawTextAndData(dc, labels.TimeOfDay, todString, _posDetails.RightColumn, _posDetails.BottomRow);
         }
 
-        private function drawTextAndData(dc, label, data, x, y) {
+        private function drawTextAndData(dc as Dc, label as String, data as String, x as Numeric, y as Numeric) as Void {
             dc.drawText(x, y - _posDetails.DataAndLabelOffset, _posDetails.LabelFont, label, Graphics.TEXT_JUSTIFY_CENTER);
             dc.drawText(x, y, _posDetails.DataFont, data, Graphics.TEXT_JUSTIFY_CENTER);
         }
 
-        private function getPaceLabel(activity, labels) {
-            if (activity == ActivityRecording.SPORT_CYCLING) {
+        private function getPaceLabel(activity as Activity, labels as data.Labels) as String {
+            if (activity == Activity.SPORT_CYCLING) {
                 return labels.Speed;
             }
-            if (activity == ActivityRecording.SPORT_SWIMMING) {
+            if (activity == Activity.SPORT_SWIMMING) {
                 return labels.SwimPace;
             }
             return labels.Pace;
         }
 
-        private function getPaceString(data) {
-            if (data.Activity == ActivityRecording.SPORT_CYCLING) {
+        private function getPaceString(data as data.ViewDataset) as String {
+            if (data.Activity == Activity.SPORT_CYCLING) {
                 return data.Formatter.get1dpFloat(data.Speed);
             }
-            var multiplier = data.Activity == ActivityRecording.SPORT_SWIMMING ? 0.1 : 1.0; // swimming is per 100m
+            var multiplier = data.Activity == Activity.SPORT_SWIMMING ? 0.1 : 1.0; // swimming is per 100m
             return data.Formatter.getPace(data.Pace * multiplier);
         }
 
         // Called when this View is removed from the screen. Save the
         // state of this View here. This includes freeing resources from
         // memory.
-        function onHide() {
+        function onHide() as Void {
             _timer.stop();
         }
 
         // Handler for the _timer callback
-        function onTimer() {
+        function onTimer() as Void {
             Ui.requestUpdate();
         }
 
-        private function getGpsAccuracy(data) {
+        private function getGpsAccuracy(data as data.ViewDataset) as Application.ResourceType or Application.ResourceReferenceType {
             if (data.GpsAccuracy == Position.QUALITY_GOOD) {
                 return Ui.loadResource(Rez.Strings.gps_good);
             } else if (data.GpsAccuracy == Position.QUALITY_USABLE) {

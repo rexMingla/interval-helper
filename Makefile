@@ -31,7 +31,7 @@ deploy: build
 	@cp bin/$(appName).prg $(DEPLOY)
 
 package:
-	@$(SDK_HOME)/bin/monkeyc --warn --output bin/$(appName).iq -m manifest.xml \
+	@$(SDK_HOME)/bin/monkeyc -ssarn --output bin/$(appName).iq -m manifest.xml \
 	-z $(resources):resources/drawables/drawables.xml -u $(SDK_HOME)/bin/devices.xml \
 	-y $(PRIVATE_KEY)
 	-p $(SDK_HOME)/bin/projectInfo.xml $(sources) -e -r

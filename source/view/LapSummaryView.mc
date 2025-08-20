@@ -2,27 +2,29 @@ using Toybox.WatchUi as Ui;
 using Toybox.Application;
 using Toybox.Timer;
 using Toybox.Graphics;
+import Toybox.Lang;
+import Toybox.Graphics;
 
 module view {
     class LapSummaryView extends Ui.View {
-        hidden var _data;
-        hidden var _posDetails;
+        hidden var _data as Dc;
+        hidden var _posDetails as data.PositionDetails;
 
-        function initialize(data) {
+        function initialize(dc as Dc) {
             View.initialize();
             _data = data;
         }
 
-        function onLayout(dc) {
+        function onLayout(dc as Dc) as Void {
             _posDetails = data.PositionDetails.createFromDataContext(dc);
         }
 
-        function onShow() {
+        function onShow() as Void {
             Ui.requestUpdate();
         }
 
         // Update the view
-        function onUpdate(dc) {
+        function onUpdate(dc as Dc) as Void {
             View.onUpdate(dc);
 
             var labels = _data.Labels.Lap;
@@ -42,7 +44,7 @@ module view {
             drawTextAndData(dc, bottomLabelString, bottomLabelData, _posDetails.CentreColumn, _posDetails.BottomRow);
         }
 
-        private function drawTextAndData(dc, label, data, x, y) {
+        private function drawTextAndData(dc as Graphics.Dc, label as String, data as String, x as Numeric, y as Numeric) as Void {
             dc.drawText(x, y - _posDetails.DataAndLabelOffset, _posDetails.LabelFont, label, Graphics.TEXT_JUSTIFY_CENTER);
             dc.drawText(x, y, _posDetails.DataFont, data, Graphics.TEXT_JUSTIFY_CENTER);
         }

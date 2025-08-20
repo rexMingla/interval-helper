@@ -5,46 +5,48 @@ using Toybox.Attention;
 using Toybox.Timer;
 using Toybox.FitContributor;
 using Toybox.ActivityRecording;
+using Toybox.Sensor;
+import Toybox.Lang;
+
+enum ViewType {
+    Lap,
+    Total
+}
+
+enum RecordingMode {
+    NoRecord,
+    RecordNoGps,
+    RecordWithGps
+}
 
 class Model
 {
-    hidden var _timer;
-    hidden var _session;
-    hidden var _lapTimer;
-    hidden var _lap;
-    hidden var _lapSeconds;
-    hidden var _isActive;
-    hidden var _startOfLapDistance;
-    hidden var _activity;
-    hidden var _offLapRecordingMode;
-    hidden var _isRunning;
-    hidden var _speedConversion;
+    hidden var _timer as Timer.Timer or Null;
+    hidden var _session as ActivityRecording.Session or Null;
+    hidden var _lapTimer as Timer.Timer or Null;
+    hidden var _lap as Number;
+    hidden var _lapSeconds as Number;
+    hidden var _isActive as Boolean;
+    hidden var _startOfLapDistance as Number;
+    hidden var _activity as Activity or Null;
+    hidden var _offLapRecordingMode as RecordingMode or Null;
+    hidden var _isRunning as Boolean = false;
+    hidden var _speedConversion as Double;
 
-    hidden var _lapCurrentData;
-    hidden var _overallData;
+    hidden var _lapCurrentData as data.ViewDataset;
+    hidden var _overallData as data.ViewDataset;
 
-    hidden var _views = [Lap, Total];
-    hidden var _currentViewIndex;
+    hidden var _views as Array<ViewType> = [Lap, Total] as Array<ViewType>;
+    hidden var _currentViewIndex as Number;
 
-    hidden const KmsToMiles = 0.621371;
+    hidden const KmsToMiles as Float = 0.621371;
 
-    enum {
-       Lap,
-       Total
-    }
-
-    enum {
-        NoRecord,
-        RecordNoGps,
-        RecordWithGps
-    }
-
-    hidden static var mAllSensorsByActivityType = {
-        ActivityRecording.SPORT_RUNNING => [Sensor.SENSOR_HEARTRATE, Sensor.SENSOR_FOOTPOD, Sensor.SENSOR_TEMPERATURE],
-        ActivityRecording.SPORT_CYCLING => [Sensor.SENSOR_BIKESPEED, Sensor.SENSOR_BIKECADENCE, Sensor.SENSOR_BIKEPOWER, Sensor.SENSOR_HEARTRATE, Sensor.SENSOR_FOOTPOD, Sensor.SENSOR_TEMPERATURE],
-        ActivityRecording.SPORT_SWIMMING => [Sensor.SENSOR_TEMPERATURE],
-        ActivityRecording.SPORT_GENERIC => [Sensor.SENSOR_HEARTRATE, Sensor.SENSOR_FOOTPOD, Sensor.SENSOR_TEMPERATURE]
-    };
+    hidden static var mAllSensorsByActivityType as Dictionary<Activity.Sport, Array<Sensor.SensorType>> = {
+        Activity.SPORT_RUNNING => [Sensor.SENSOR_HEARTRATE, Sensor.SENSOR_FOOTPOD, Sensor.SENSOR_TEMPERATURE],
+        Activity.SPORT_CYCLING => [Sensor.SENSOR_BIKESPEED, Sensor.SENSOR_BIKECADENCE, Sensor.SENSOR_BIKEPOWER, Sensor.SENSOR_HEARTRATE, Sensor.SENSOR_FOOTPOD, Sensor.SENSOR_TEMPERATURE],
+        Activity.SPORT_SWIMMING => [Sensor.SENSOR_TEMPERATURE],
+        Activity.SPORT_GENERIC => [Sensor.SENSOR_HEARTRATE, Sensor.SENSOR_FOOTPOD, Sensor.SENSOR_TEMPERATURE]
+    } as Dictionary<Activity.Sport, Array<Sensor.SensorType>>;
 
     function initialize() {
         _lap = 0;
@@ -56,7 +58,7 @@ class Model
         Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:positionCallback));
 
         var activity = Application.getApp().getProperty("activity");
-        setActivity(activity != null ? activity : ActivityRecording.SPORT_RUNNING);
+        setActivity(activity != null ? activity as Activity : ActivityRecording.SPORT_RUNNING);
         _lapCurrentData = new data.ViewDataset();
         _overallData = new data.ViewDataset();
         _speedConversion = System.getDeviceSettings().paceUnits == System.UNIT_METRIC ? 1 : KmsToMiles;
@@ -67,26 +69,26 @@ class Model
         setOffLapRecordingMode(offLapMode);
     }
 
-    function setActivity(activity) {
+    function setActivity(activity as Activity) as Void {
         _activity = activity;
         Sensor.setEnabledSensors(mAllSensorsByActivityType[_activity]);
         Application.getApp().setProperty("activity", _activity);
     }
 
-    function getActivity() {
+    function getActivity() as Activity {
         return _activity;
     }
 
-    function setOffLapRecordingMode(offLapMode) {
+    function setOffLapRecordingMode(offLapMode as RecordingMode) as Void {
         _offLapRecordingMode = offLapMode;
         Application.getApp().setProperty("offLapRecordingMode", _offLapRecordingMode);
     }
 
-    function offLapRecordingMode() {
+    function offLapRecordingMode() as Boolean {
         return _offLapRecordingMode;
     }
 
-    function start() {
+    function start() as Void {
         if (!hasStarted()) {
             _session = ActivityRecording.createSession({:sport=>_activity, :name=>"Intervals"});
             _lap = 1;
@@ -99,13 +101,13 @@ class Model
         _isRunning = true;
     }
 
-    function stop() {
+    function stop() as Void {
         _lapTimer.stop();
         _session.stop();
         _isRunning = false;
     }
 
-    function startLap() {
+    function startLap() as Void {
         _lap++;
         _lapSeconds = 0;
         _isActive = !_isActive;
@@ -128,27 +130,27 @@ class Model
         _lapTimer.start(method(:lapCallback), 1000, true);
     }
 
-    function hasStarted() {
+    function hasStarted() as Boolean {
         return _lap > 0;
     }
 
-    function isActiveLap() {
+    function isActiveLap() as Boolean {
         return _isActive;
     }
 
-    function isRunning() {
+    function isRunning() as Boolean {
         return _isRunning;
     }
 
-    function save() {
+    function save() as Void {
         _session.save();
     }
 
-    function discard() {
+    function discard() as Void {
         _session.discard();
     }
 
-    function getLapData() {
+    function getLapData() as data.ViewDataset {
         var info = Activity.getActivityInfo();
         _lapCurrentData.IsActive = isActiveLap();
         _lapCurrentData.LapNumber = (getLap() + 1) / 2;
@@ -167,7 +169,7 @@ class Model
         return _lapCurrentData;
     }
 
-    function getTotalData() {
+    function getTotalData() as data.ViewDataset {
         var info = Activity.getActivityInfo();
         _overallData.IsActive = isActiveLap();
         _overallData.LapNumber = (getLap() + 1) / 2;
@@ -184,26 +186,26 @@ class Model
         return _overallData;
     }
 
-    private function getLap() {
+    private function getLap() as Number {
         return _lap;
     }
 
-    function getCurrentView() {
+    function getCurrentView() as ViewType {
         return _views[_currentViewIndex];
     }
 
-    function cycleView(offset) {
+    function cycleView(offset) as ViewType {
         _currentViewIndex = (_views.size() + _currentViewIndex + offset) % _views.size();
     }
 
-    function lapCallback() {
+    function lapCallback() as Void {
         _lapSeconds++;
     }
 
-    private function safeGetNumber(n) {
+    private function safeGetNumber(n as Double) as Double {
         return n == null ? 0 : n;
     }
 
-    function positionCallback(info) {
+    function positionCallback(info) as Void {
     }
 }

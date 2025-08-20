@@ -3,14 +3,15 @@ using Toybox.Application;
 using Toybox.WatchUi;
 using Toybox.System;
 using Toybox.Attention;
+import Toybox.Lang;
 
 class Controller {
-    hidden var _model;
-    hidden var _timer;
-    hidden var _isShowingLapSummaryView;
-    hidden var _isTonesOn;
-    hidden var _isVibrateOn;
-    hidden var _hasCheckboxFeature;
+    hidden var _model as Model;
+    hidden var _timer as Timer.Timer;
+    hidden var _isShowingLapSummaryView as Boolean = false;
+    hidden var _isTonesOn as Boolean = false;
+    hidden var _isVibrateOn as Boolean = false;
+    hidden var _hasCheckboxFeature as Boolean = false;
 
     function initialize() {
         _timer = new Timer.Timer();
@@ -21,35 +22,35 @@ class Controller {
         _hasCheckboxFeature = WatchUi has :Menu2;
     }
 
-    function setActivity(activity) {
+    function setActivity(activity as Toybox.Activity) as Void {
         _model.setActivity(activity);
         if (_hasCheckboxFeature) {
             WatchUi.popView(WatchUi.SLIDE_DOWN);
         }
     }
 
-    function setOffLapRecordingMode(mode) {
+    function setOffLapRecordingMode(mode as RecordingMode) as Void {
         _model.setOffLapRecordingMode(mode);
         if (_hasCheckboxFeature) {
             WatchUi.popView(WatchUi.SLIDE_DOWN);
         }
     }
 
-    function offLapRecordingMode() {
+    function offLapRecordingMode() as RecordingMode {
         return _model.offLapRecordingMode();
     }
 
-    function start() {
+    function start() as Void {
         performAttention(Attention has :TONE_START ? Attention.TONE_START : null);
         _model.start();
     }
 
-    function stop() {
+    function stop() as Void {
         performAttention(Attention has :TONE_STOP ? Attention.TONE_STOP : null);
         _model.stop();
     }
 
-    function save() {
+    function save() as Void {
         performAttention(Attention has :TONE_KEY ? Attention.TONE_KEY : null);
         _model.save();
         // Give the system some time to finish the recording. Push up a progress bar
@@ -59,7 +60,7 @@ class Controller {
         _timer.start(method(:onExit), 3000, false);
     }
 
-    function discard() {
+    function discard() as Void {
         performAttention(Attention has :TONE_KEY ? Attention.TONE_KEY : null);
         _model.discard();
         // Give the system some time to discard the recording. Push up a progress bar
@@ -70,7 +71,7 @@ class Controller {
     }
 
     // Handle the start/stop button
-    function onStartStop() {
+    function onStartStop() as Void {
         if (!hasStarted()) {
             onStartActivity();
         } else if (!isRunning()) {
@@ -81,39 +82,21 @@ class Controller {
         }
     }
 
-    function onStartActivity() {
+    function onStartActivity() as Void {
         WatchUi.pushView(new Rez.Menus.StartMenu(), new delegate.StartMenuDelegate(), WatchUi.SLIDE_UP);
     }
 
-    function onSelectActivity() {
+    function onSelectActivity() as Void {
         var activity = _model.getActivity();
-        if (_hasCheckboxFeature) {
-            var menu = new WatchUi.Menu2({:title=>WatchUi.loadResource(Rez.Strings.menu_activity_title)});
-            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_run), null, ActivityRecording.SPORT_RUNNING, activity == ActivityRecording.SPORT_RUNNING, {}));
-            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_bike), null, ActivityRecording.SPORT_CYCLING, activity == ActivityRecording.SPORT_CYCLING, {}));
-            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_swim), null, ActivityRecording.SPORT_SWIMMING, activity == ActivityRecording.SPORT_SWIMMING, {}));
-            menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_other), null, ActivityRecording.SPORT_GENERIC, activity == ActivityRecording.SPORT_GENERIC, {}));
-            WatchUi.pushView(menu, new delegate.ActivityInputDelegate(), WatchUi.SLIDE_UP);
-        } else {
-            var menu = new WatchUi.Menu();
-            menu.setTitle(WatchUi.loadResource(Rez.Strings.menu_activity_title));
-            menu.addItem(activity == ActivityRecording.SPORT_RUNNING
-                ? WatchUi.loadResource(Rez.Strings.menu_activity_run_selected)
-                : WatchUi.loadResource(Rez.Strings.menu_activity_run), ActivityRecording.SPORT_RUNNING);
-            menu.addItem(activity == ActivityRecording.SPORT_CYCLING
-                ? WatchUi.loadResource(Rez.Strings.menu_activity_bike_selected)
-                : WatchUi.loadResource(Rez.Strings.menu_activity_bike), ActivityRecording.SPORT_CYCLING);
-            menu.addItem(activity == ActivityRecording.SPORT_SWIMMING
-                ? WatchUi.loadResource(Rez.Strings.menu_activity_swim_selected)
-                : WatchUi.loadResource(Rez.Strings.menu_activity_swim), ActivityRecording.SPORT_SWIMMING);
-            menu.addItem(activity == ActivityRecording.SPORT_GENERIC
-                ? WatchUi.loadResource(Rez.Strings.menu_activity_other_selected)
-                : WatchUi.loadResource(Rez.Strings.menu_activity_other), ActivityRecording.SPORT_GENERIC);
-            WatchUi.pushView(menu, new delegate.OldActivityInputDelegate(), WatchUi.SLIDE_UP);
-        }
+        var menu = new WatchUi.Menu2({:title=>WatchUi.loadResource(Rez.Strings.menu_activity_title)});
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_run), null, Activity.SPORT_RUNNING, activity == Activity.SPORT_RUNNING, {}));
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_bike), null, Activity.SPORT_CYCLING, activity == Activity.SPORT_CYCLING, {}));
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_swim), null, Activity.SPORT_SWIMMING, activity == Activity.SPORT_SWIMMING, {}));
+        menu.addItem(new WatchUi.ToggleMenuItem(WatchUi.loadResource(Rez.Strings.menu_activity_other), null, Activity.SPORT_GENERIC, activity == Activity.SPORT_GENERIC, {}));
+        WatchUi.pushView(menu, new delegate.ActivityInputDelegate(), WatchUi.SLIDE_UP);
     }
 
-    function onSelectMode() {
+    function onSelectMode() as Void {
         var mode = offLapRecordingMode();
         if (_hasCheckboxFeature) {
             var menu = new WatchUi.Menu2({:title=>WatchUi.loadResource(Rez.Strings.menu_mode_title)});
@@ -137,19 +120,19 @@ class Controller {
         }
     }
 
-    function isActiveLap() {
+    function isActiveLap() as Void {
         return _model.isActiveLap();
     }
 
-    function isRunning() {
+    function isRunning() as Boolean {
         return _model.isRunning();
     }
 
-    function hasStarted() {
+    function hasStarted() as Boolean {
         return _model.hasStarted();
     }
 
-    function onLap() {
+    function onLap() as Void {
         performAttention(Attention has :TONE_LAP ? Attention.TONE_LAP : null);
         var data = _model.getLapData().clone();
         _model.startLap();
@@ -164,23 +147,23 @@ class Controller {
         _timer.start(method(:hideLapSummaryView), 5000, false);
     }
 
-    function hideLapSummaryView() {
+    function hideLapSummaryView() as Void {
         if (_isShowingLapSummaryView) {
             WatchUi.popView(WatchUi.SLIDE_DOWN);
             _isShowingLapSummaryView = false;
         }
     }
 
-    function onExit() {
+    function onExit() as Void {
         System.exit();
     }
 
-    function cycleView(offset) {
+    function cycleView(offset as Number) as Void {
         _model.cycleView(offset);
         WatchUi.requestUpdate();
     }
 
-    function performAttention(tone) {
+    function performAttention(tone as Attention) as Void {
         if (Attention has :playTone && _isTonesOn && tone != null) {
             Attention.playTone(tone);
         }

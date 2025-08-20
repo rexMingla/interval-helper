@@ -2,6 +2,7 @@ using Toybox.WatchUi as Ui;
 using Toybox.System as Sys;
 using Toybox.Application;
 using Toybox.Timer;
+import Toybox.Lang;
 
 // This delegate handles input for the Menu pushed when the user
 // selects the sport
@@ -9,7 +10,7 @@ using Toybox.Timer;
 module delegate {
     class OldActivityInputDelegate extends Ui.MenuInputDelegate {
 
-        private var _controller;
+        private var _controller as Controller;
 
         function initialize() {
             MenuInputDelegate.initialize();
@@ -17,9 +18,8 @@ module delegate {
         }
 
         // Handle the menu input
-        function onMenuItem(id) {
+        function onMenuItem(id as Symbol) as Void {
             _controller.setActivity(id);
-            return false;
         }
     }
 }

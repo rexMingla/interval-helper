@@ -1,15 +1,17 @@
+import Toybox.Lang;
+
 module data {
     class ViewDataset {
-        public var LapNumber;
-        public var IsActive;
-        public var Distance;
-        public var HeartRate;
-        public var Pace;
-        public var Speed;
-        public var ElapsedSeconds;
-        public var GpsAccuracy;
-        public var Activity;
-        public var IsRunning;
+        public var LapNumber as Number;
+        public var IsActive as Boolean;
+        public var Distance as Double;
+        public var HeartRate as Number;
+        public var Pace as Double;
+        public var Speed as Double;
+        public var ElapsedSeconds as Double;
+        public var GpsAccuracy as Toybox.Position;
+        public var Activity as Toybox.Activity;
+        public var IsRunning as Boolean;
 
         function initialize() {
             LapNumber = 0;
