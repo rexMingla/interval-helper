@@ -1,31 +1,24 @@
+import Toybox.Lang;
+import Toybox.Position;
+
 module data {
     class ViewDataset {
-        public var LapNumber;
-        public var IsActive;
-        public var Distance;
-        public var HeartRate;
-        public var Pace;
-        public var Speed;
-        public var ElapsedSeconds;
-        public var GpsAccuracy;
-        public var Activity;
-        public var IsRunning;
+        public var LapNumber as Number = 0;
+        public var IsActive as Boolean = false;
+        public var Distance as Numeric = 0;
+        public var HeartRate as Numeric = 0;
+        public var Pace as Numeric = 0;
+        public var Speed as Numeric = 0;
+        public var ElapsedSeconds as Number = 0;
+        public var GpsAccuracy as Position.Quality or Null = null;
+        public var Activity as Number = 0;
+        public var IsRunning as Boolean = false;
 
         function initialize() {
-            LapNumber = 0;
-            IsActive = false;
-            Distance = 0;
-            HeartRate = 0;
-            Pace = 0;
-            Speed = 0;
-            ElapsedSeconds = 0;
-            GpsAccuracy = null;
-            Activity = null;
-            IsRunning = false;
         }
 
-        function clone() {
-            var ret =  new ViewDataset();
+        function clone() as ViewDataset {
+            var ret = new ViewDataset();
             ret.LapNumber = LapNumber;
             ret.IsActive = IsActive;
             ret.Distance = Distance;

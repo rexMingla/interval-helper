@@ -4,6 +4,7 @@
 // Application Developer Agreement.
 //
 
+import Toybox.Lang;
 using Toybox.WatchUi;
 
 module delegate {
@@ -14,7 +15,7 @@ module delegate {
             BehaviorDelegate.initialize();
         }
 
-        function onBack() {
+        function onBack() as Boolean {
             return true;
         }
     }
