@@ -1,3 +1,4 @@
+import Toybox.Lang;
 using Toybox.WatchUi as Ui;
 using Toybox.System as Sys;
 using Toybox.Application;
@@ -16,10 +17,9 @@ module delegate {
         }
 
         // Handle the menu input
-        function onSelect(item) {
+        function onSelect(item as Ui.MenuItem) as Void {
             var id = item.getId();
             _controller.setActivity(id);
-            return true;
         }
     }
 }

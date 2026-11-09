@@ -7,6 +7,8 @@
     <string id="menu_start_mode">Select Recording Mode</string>
 
     <string id="middle">Default</string>
+    <string id="menu_start_title">Intervals</string>
+    <string id="menu_pause_title">Paused</string>
     <string id="menu_label_1">Resume</string>
     <string id="menu_label_2">Save</string>
     <string id="menu_label_3">Discard</string>  
@@ -16,18 +18,11 @@
     <string id="menu_activity_bike">Bike</string>
     <string id="menu_activity_swim">Swim</string>
     <string id="menu_activity_other">Other</string>
-    <string id="menu_activity_run_selected">*Run</string>
-    <string id="menu_activity_bike_selected">*Bike</string>
-    <string id="menu_activity_swim_selected">*Swim</string>
-    <string id="menu_activity_other_selected">*Other</string>
     
     <string id="menu_mode_title">Record Mode</string>
     <string id="menu_mode_norecord">Ignore off laps</string>
     <string id="menu_mode_recordnogps">Record, no gps</string>
     <string id="menu_mode_recordwithgps">Record, with gps</string>
-    <string id="menu_mode_norecord_selected">*Ignore off laps</string>
-    <string id="menu_mode_recordnogps_selected">*Record, no gps</string>
-    <string id="menu_mode_recordwithgps_selected">*Record, with gps</string>
     
     <!-- labels -->
     <string id="view_time_of_day">Time</string>

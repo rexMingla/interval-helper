@@ -32,10 +32,12 @@ module delegate {
 
         function onNextPage() {
             _controller.hideLapSummaryView();
+            return true;
         }
 
         function onPreviousPage() {
             _controller.hideLapSummaryView();
+            return true;
         }
     }
 }

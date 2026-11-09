@@ -38,10 +38,12 @@ module delegate {
 
         function onNextPage() {
             _controller.cycleView(1);
+            return true;
         }
 
         function onPreviousPage() {
             _controller.cycleView(-1);
+            return true;
         }
     }
 }
