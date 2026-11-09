@@ -99,6 +99,15 @@ class Model
         _isRunning = true;
     }
 
+    // Garmin also turns location events off whenever the app goes inactive (e.g. screen off).
+    // Re-assert them, unless GPS is deliberately off for a recovery lap.
+    function enableGps() {
+        if (hasStarted() && !isActiveLap() && _offLapRecordingMode == RecordNoGps) {
+            return;
+        }
+        Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:positionCallback));
+    }
+
     function stop() {
         _lapTimer.stop();
         _session.stop();
