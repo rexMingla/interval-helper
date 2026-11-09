@@ -1,3 +1,5 @@
+import Toybox.Lang;
+import Toybox.Position;
 using Toybox.Activity;
 using Toybox.Sensor;
 using Toybox.System;
@@ -205,7 +207,7 @@ class Model
         _currentViewIndex = (_views.size() + _currentViewIndex + offset) % _views.size();
     }
 
-    function lapCallback() {
+    function lapCallback() as Void {
         _lapSeconds++;
     }
 
@@ -213,6 +215,6 @@ class Model
         return n == null ? 0 : n;
     }
 
-    function positionCallback(info) {
+    function positionCallback(info as Position.Info) as Void {
     }
 }

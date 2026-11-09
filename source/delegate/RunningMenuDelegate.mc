@@ -1,31 +1,29 @@
+import Toybox.Lang;
 using Toybox.WatchUi as Ui;
-using Toybox.System as Sys;
 using Toybox.Application;
-using Toybox.Timer;
 
 module delegate {
-    class RunningMenuDelegate extends Ui.MenuInputDelegate {
+    // Handles input for the menu shown when the activity is paused
+    class RunningMenuDelegate extends Ui.Menu2InputDelegate {
 
         private var _controller;
 
         function initialize() {
-            MenuInputDelegate.initialize();
+            Menu2InputDelegate.initialize();
             _controller = Application.getApp().getController();
         }
 
-        // Handle the menu input
-        function onMenuItem(item) {
-            if (item == :resume) {
+        function onSelect(item as Ui.MenuItem) as Void {
+            var id = item.getId();
+            // unlike the legacy Menu, Menu2 does not close itself on selection
+            Ui.popView(Ui.SLIDE_DOWN);
+            if (id == :resume) {
                 _controller.start();
-                return true;
-            } else if (item == :save) {
+            } else if (id == :save) {
                 _controller.save();
-                return true;
             } else {
                 _controller.discard();
-                return true;
             }
-            return false;
         }
     }
 }
