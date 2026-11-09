@@ -6,15 +6,15 @@ module delegate {
     // Handles input for the menu shown when the activity is paused
     class RunningMenuDelegate extends Ui.Menu2InputDelegate {
 
-        private var _controller;
+        private var _controller as Controller;
 
         function initialize() {
             Menu2InputDelegate.initialize();
-            _controller = Application.getApp().getController();
+            _controller = (Application.getApp() as IntervalApp).getController();
         }
 
         function onSelect(item as Ui.MenuItem) as Void {
-            var id = item.getId();
+            var id = item.getId() as Symbol;
             // unlike the legacy Menu, Menu2 does not close itself on selection
             Ui.popView(Ui.SLIDE_DOWN);
             if (id == :resume) {
